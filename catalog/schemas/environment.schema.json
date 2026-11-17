@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "environment.schema.json",
+  "title": "Catalogue d'environnement (CAT-02)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "subscription_id", "criticality", "name_suffix", "github", "budget", "observability", "alerting", "gateway", "access", "applications"],
+  "$defs": {
+    "guid": {"type": "string", "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$"},
+    "guids": {"type": "array", "items": {"$ref": "#/$defs/guid"}, "uniqueItems": true}
+  },
+  "properties": {
+    "name": {"enum": ["dev", "prod"]},
+    "subscription_id": {"$ref": "#/$defs/guid"},
+    "criticality": {"enum": ["low", "medium", "high"]},
+    "name_suffix": {"type": "string", "pattern": "^[0-9]{2}$"},
+    "github": {
+      "type": "object", "additionalProperties": false, "required": ["deploy_branch", "plan_on_pull_request"],
+      "properties": {"deploy_branch": {"type": "string"}, "plan_on_pull_request": {"type": "boolean"}}
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false, "required": ["monthly_amount_eur", "thresholds_percent", "contact_emails"],
+      "properties": {
+        "monthly_amount_eur": {"type": "number", "exclusiveMinimum": 0},
+        "thresholds_percent": {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 1000}, "minItems": 1},
+        "contact_emails": {"type": "array", "items": {"type": "string", "format": "email"}}
+      }
+    },
+    "observability": {
+      "type": "object", "additionalProperties": false, "required": ["retention_days", "daily_quota_gb", "ingestion_alert_gb"],
+      "properties": {
+        "retention_days": {"type": "integer", "minimum": 30, "maximum": 730},
+        "daily_quota_gb": {"type": "number", "exclusiveMinimum": 0},
+        "ingestion_alert_gb": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "alerting": {
+      "type": "object", "additionalProperties": false,
+      "required": ["emails", "availability_percent_min", "error_rate_percent_max", "throttled_calls_max", "latency_p95_ms_max"],
+      "properties": {
+        "emails": {"type": "array", "items": {"type": "string", "format": "email"}},
+        "availability_percent_min": {"type": "number", "minimum": 0, "maximum": 100},
+        "error_rate_percent_max": {"type": "number", "minimum": 0, "maximum": 100},
+        "throttled_calls_max": {"type": "integer", "minimum": 1},
+        "latency_p95_ms_max": {"type": "integer", "minimum": 1}
+      }
+    },
+    "gateway": {
+      "type": "object", "additionalProperties": false, "required": ["publisher_name", "publisher_email"],
+      "properties": {"publisher_name": {"type": "string"}, "publisher_email": {"type": "string", "format": "email"}}
+    },
+    "access": {
+      "type": "object", "additionalProperties": false, "required": ["utilisateur", "admin-offre", "exploitation"],
+      "properties": {"utilisateur": {"$ref": "#/$defs/guids"}, "admin-offre": {"$ref": "#/$defs/guids"}, "exploitation": {"$ref": "#/$defs/guids"}}
+    },
+    "applications": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "display_name", "channel", "owner", "allowed_models", "limits", "key_readers"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,40}$"},
+          "display_name": {"type": "string"},
+          "channel": {"type": "string"},
+          "owner": {"type": "string", "minLength": 2},
+          "allowed_models": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "limits": {
+            "type": "object", "additionalProperties": false, "required": ["calls_per_minute", "calls_per_period", "period_seconds"],
+            "properties": {
+              "calls_per_minute": {"type": "integer", "minimum": 1},
+              "calls_per_period": {"type": "integer", "minimum": 1},
+              "period_seconds": {"type": "integer", "minimum": 60}
+            }
+          },
+          "key_readers": {"$ref": "#/$defs/guids"}
+        }
+      }
+    }
+  }
+}

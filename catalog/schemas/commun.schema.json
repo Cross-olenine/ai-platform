@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "commun.schema.json",
+  "title": "Paramètres communs de la plateforme",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["platform", "tags", "governance", "bootstrap", "gateway_api", "github"],
+  "properties": {
+    "platform": {
+      "type": "object", "additionalProperties": false,
+      "required": ["prefix", "location", "location_short", "tenant_id", "default_company_id"],
+      "properties": {
+        "prefix": {"type": "string", "pattern": "^[a-z][a-z0-9]{2,8}$"},
+        "location": {"type": "string"},
+        "location_short": {"type": "string", "pattern": "^[a-z]{2,4}$"},
+        "tenant_id": {"type": "string", "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$"},
+        "default_company_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,40}$"}
+      }
+    },
+    "tags": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "governance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allowed_locations", "allowed_model_deployment_types", "required_tags", "tag_policy_effect", "delegable_roles"],
+      "properties": {
+        "allowed_locations": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "allowed_model_deployment_types": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "required_tags": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "tag_policy_effect": {"enum": ["Audit", "Deny", "Disabled"]},
+        "delegable_roles": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "bootstrap": {"type": "object", "required": ["name_suffix"], "properties": {"name_suffix": {"type": "string", "pattern": "^[0-9]{2}$"}}},
+    "gateway_api": {"type": "object", "required": ["preauthorized_client_ids"], "properties": {"preauthorized_client_ids": {"type": "array", "items": {"type": "string"}}}},
+    "github": {
+      "type": "object", "additionalProperties": false,
+      "required": ["owner", "repository", "visibility", "required_approvals", "prod_reviewers", "required_status_check", "branches"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "visibility": {"enum": ["public", "private"]},
+        "required_approvals": {"type": "integer", "minimum": 0, "maximum": 6},
+        "prod_reviewers": {"type": "array", "items": {"type": "string"}},
+        "required_status_check": {"type": "string"},
+        "branches": {"type": "object"}
+      }
+    }
+  }
+}
