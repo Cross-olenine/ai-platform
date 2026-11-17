@@ -6,7 +6,7 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 |---|---|---|---|---|
 | MGW-01 | Les consommateurs n'appellent que des alias fonctionnels stables. La correspondance alias → déploiement vit dans le catalogue des modèles. | V1 | C | À faire |
 | MGW-02 | Tout modèle absent du catalogue est refusé (liste blanche). | V1 | C | À faire |
-| MGW-03 | Une limite d'appels par minute et un quota d'appels par période sont appliqués à la passerelle, par abonnement (une application). Les limites de tokens sont reportées à MGW-20 (niveau Consumption : pas de limite de tokens). | V1 | N | À faire |
+| MGW-03 | Une limite d'appels par minute et un quota d'appels par période sont appliqués à la passerelle, par abonnement (une application). Les limites de tokens sont reportées à MGW-20 (niveau Consumption : pas de limite de tokens, ADR-18). | V1 | N | À faire |
 | MGW-04 | La limite et le quota s'appliquent aussi par société et par utilisateur. | V2 | N | À faire |
 | MGW-05 | Chaque alias a un plafond de tokens de sortie et une taille maximale de requête. | V1 | C | À faire |
 | MGW-06 | Le streaming fonctionne de bout en bout, sans mise en tampon à la passerelle. | V1 | C | À faire |

@@ -30,7 +30,7 @@ Les ordres de grandeur sont indicatifs. Le passage d'une version à l'autre est 
 | **C5** | Multi-agents et tâches longues | Orchestration de plusieurs agents, traitements de plusieurs minutes ou heures, validation humaine intermédiaire |
 | **C6** | Assistant de développement (Software Factory) | OpenCode branché sur la passerelle |
 
-C6 est techniquement simple (c'est un client de la passerelle) mais c'est la classe la plus consommatrice de tokens. Elle est ouverte en V1 avec des limites d'appels par application (MGW-03), sans limite de tokens (niveau Consumption). Les limites de tokens (MGW-20) et les quotas par utilisateur (MGW-04) arrivent en V2 et permettent d'ouvrir C6 largement.
+C6 est techniquement simple (c'est un client de la passerelle) mais c'est la classe la plus consommatrice de tokens. Elle est ouverte en V1 avec des limites d'appels par application (MGW-03), sans limite de tokens (niveau Consumption, ADR-18). Les limites de tokens (MGW-20) et les quotas par utilisateur (MGW-04) arrivent en V2 et permettent d'ouvrir C6 largement.
 
 ## Niveaux de maturité d'un cas d'usage
 

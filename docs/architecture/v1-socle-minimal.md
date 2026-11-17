@@ -21,9 +21,9 @@ flowchart LR
 
 | Domaine | Contenu V1 |
 |---|---|
-| Environnements | Développement et production. Une région de l'UE. |
+| Environnements | Développement et production. Une région de l'UE : France Central. |
 | Identité | Jeton Entra ID obligatoire, un seul tenant. Identité managée entre la passerelle et Foundry. Authentification par clé désactivée sur Foundry. |
-| Passerelle | Une instance API Management par environnement. Niveau Consumption. Fragments : authentification, contexte, corrélation, liste blanche, limite d'appels par abonnement, erreurs normalisées, routage par alias. |
+| Passerelle | Une instance API Management par environnement. Niveau Consumption (ADR-18). Fragments : authentification, contexte, corrélation, liste blanche, limite d'appels par abonnement, erreurs normalisées, routage par alias. |
 | Modèles | 2 alias (un généraliste, un rapide et économique). Déploiements en zone de données UE. |
 | Agents | Agents managés définis par configuration. Sessions gérées par le runtime. |
 | Canal | Un seul adaptateur, choisi selon le premier cas d'usage. |
@@ -53,15 +53,15 @@ flowchart LR
 
 **Dimensionnement.** Équipe de 2 à 3 personnes (H1). Les rôles de `docs/gouvernance.md` sont cumulés.
 
-**Coût fixe cible de la V1 : 0 €** (exigence FIN-07, PO-08). Postes à vérifier : instances API Management (2), ingestion et rétention des journaux, Key Vault, réseau privé (ADR-07), exécution des pipelines. Niveau Consumption en V1, niveau payant à partir de la V2 (ADR-02). Réseau privé en V2 (ADR-07).
+**Coût fixe cible de la V1 : quasi nul, chiffré et suivi** (exigence FIN-07, PO-07). Postes à vérifier : instances API Management (2), ingestion et rétention des journaux, Key Vault, réseau privé (ADR-07), exécution des pipelines. Niveau Consumption en V1, niveau payant à partir de la V2 (ADR-18). Réseau privé en V2 (ADR-07).
 
 **Critères de sortie V1 :**
 
 - [ ] un cas d'usage est en production au niveau N3 ;
 - [ ] aucun appel à un modèle ne contourne la passerelle (vérifié par test) ;
-- [ ] les limites d'appels par abonnement fonctionnent sur le niveau Consumption (PO-09) ;
-- [ ] Foundry refuse les appels hors passerelle, sans réseau privé (PO-10) ;
-- [ ] chaque appel produit un événement d'usage attribuable à un utilisateur et à une application ;
+- [ ] les limites d'appels par abonnement fonctionnent sur le niveau Consumption (PO-11) ;
+- [ ] Foundry refuse les appels hors passerelle, sans réseau privé (PO-13) ;
+- [ ] chaque appel produit un événement d'usage attribuable à un utilisateur et à une application, y compris en streaming (PO-12) ;
 - [ ] le coût estimé du mois est rapproché de la facture Azure, écart expliqué ;
 - [ ] un changement de modèle derrière un alias a été réalisé sans modifier le client ;
 - [ ] l'environnement de développement a été reconstruit entièrement depuis le code ;

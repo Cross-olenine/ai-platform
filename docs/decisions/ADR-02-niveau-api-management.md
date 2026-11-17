@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Statut** | Acceptée |
+| **Statut** | Remplacée par ADR-18 |
 | **Échéance** | V1 |
 | **Responsable** | Owner du projet |
 | **Date de décision** | 16 novembre 2026 |

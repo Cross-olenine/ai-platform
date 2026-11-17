@@ -64,6 +64,6 @@ ai-platform/
 ├── adapters/                     [V1 : un seul]
 ├── templates/                    [V2]
 ├── scripts/                      [V1]
-├── pipelines/                    [V1]
+├── .github/workflows/            [V1]  (pipelines GitHub Actions, ADR-13)
 └── tests/                        [V1]
 ```

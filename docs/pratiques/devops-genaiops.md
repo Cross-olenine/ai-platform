@@ -19,6 +19,22 @@ Aucune modification n'atteint la production sans avoir été :
 
 **Paramètres autorisés à varier entre environnements :** noms, région, capacité, quotas, budgets, URLs, configuration réseau, niveau de journalisation, rétention, identifiants de Key Vault, plans de service, règles d'approbation. Rien d'autre.
 
+## Modèle de branches
+
+Quatre branches longues, deux environnements Azure en V1 (dev, prod). Les environnements de test et de préproduction arrivent en V2 sans changer ce modèle.
+
+| Branche | Reçoit | Effet en V1 |
+|---|---|---|
+| `feature/*` | Le travail en cours, en petits commits réguliers | Contrôles automatiques et `plan` à chaque demande de changement |
+| `develop` | Les demandes de changement `feature/*` | Application automatique en développement, puis tests de l'API |
+| `test` | Une demande de changement depuis `develop` | Pas de ressource Azure : tests de l'API et évaluations rejoués contre le développement |
+| `preprod` | Une demande de changement depuis `test` | Pas de ressource Azure : `plan` de production publié pour la revue finale |
+| `main` | Une demande de changement depuis `preprod` | Application en production après approbation (environnement GitHub `prod`) |
+
+**Même code à chaque étape.** Les promotions se font par fusion avec commit de fusion. Le pipeline vérifie que l'arbre Git promu (`HEAD^{tree}`) est identique à celui de la branche source déjà validée. Aucune modification directe sur `test`, `preprod` ou `main`. Un correctif urgent suit le même chemin.
+
+**Messages de commit.** Ils citent les identifiants d'exigences, par exemple `feat(model-gateway): routage par alias (MGW-01, MGW-02)`.
+
 ## Pratiques par version
 
 | Pratique | V1 | V2 | V3 | V4 |
@@ -26,9 +42,9 @@ Aucune modification n'atteint la production sans avoir été :
 | **Environnements** | Développement, production | + recette | + environnements temporaires par demande de changement | + seconde région |
 | **Isolation** | Groupes de ressources, états, identités, Key Vaults et budgets distincts | + abonnement distinct pour la production si possible | Idem | Idem |
 | **Dépôt** | Dépôt unique modulaire | Idem | Idem | Extraction de blocs selon responsabilités et cycles de publication |
-| **Branches** | Branche principale protégée, 1 approbation, pas de push direct | + approbation renforcée pour la production, matrice d'approbation (`docs/pratiques/devops-genaiops.md`) | Idem | Idem |
+| **Branches** | `develop`, `test`, `preprod`, `main` protégées, 1 approbation, pas de push direct (voir « Modèle de branches ») | + approbation renforcée pour la production, matrice d'approbation (`docs/pratiques/devops-genaiops.md`) | Idem | Idem |
 | **Contrôles automatiques** | Format et validation Terraform, plan publié, schémas des catalogues, absence de secrets, tags | + analyse de sécurité, contrôle des suppressions et remplacements, tests des policies, documentation obligatoire | + tests des schémas d'outils et des pipelines d'ingestion | + règles de conformité sous forme de code |
-| **Déploiement** | Automatique en développement ; production sur approbation, même commit | Promotion du même artefact : développement → recette → production | Idem | Exposition progressive par anneaux et pourcentages |
+| **Déploiement** | Automatique en développement depuis `develop` ; production depuis `main` sur approbation, même arbre Git que celui validé | Promotion du même artefact : développement → recette → production | Idem | Exposition progressive par anneaux et pourcentages |
 | **Évaluations IA** | Jeu de 30 à 50 cas, lancé avant tout changement de prompt ou de modèle | Porte bloquante dans le pipeline, seuils par offre (`docs/pratiques/devops-genaiops.md`) | + évaluations RAG et outils, red teaming | Évaluation continue sur traces de production |
 | **Exposition progressive** | Non | Par société pilote, via feature flags | Par agent et par outil | Par pourcentage d'utilisateurs, avec critères de santé |
 | **Retour arrière** | Redéploiement du commit précédent, bascule d'alias | + révisions d'API, feature flags, version précédente de prompt | + versions d'index et d'outils | Automatique sur critères de santé |

@@ -4,7 +4,7 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| IAM-01 | Tout appel est authentifié par un jeton Microsoft Entra ID. Aucune clé d'API n'est distribuée aux consommateurs. | V1 | C | À faire |
+| IAM-01 | Tout appel est authentifié par un jeton Microsoft Entra ID. Aucune clé ne permet à elle seule d'appeler la plateforme. En V1 (ADR-18), une clé d'abonnement API Management identifie l'application pour les limites d'appels ; elle n'authentifie pas et ne suffit jamais sans jeton. | V1 | C | À faire |
 | IAM-02 | La passerelle accède à Foundry par identité managée. L'authentification par clé est désactivée sur les ressources Foundry. | V1 | C | À faire |
 | IAM-03 | Les rôles applicatifs (utilisateur, administrateur d'offre, exploitation) sont contrôlés à la passerelle. | V1 | C | À faire |
 | IAM-04 | Le contexte (société, utilisateur, application, offre) est résolu à partir du jeton, jamais d'un en-tête déclaré par le client. | V2 | C | À faire |
