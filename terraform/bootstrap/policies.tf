@@ -59,35 +59,24 @@ resource "azurerm_subscription_policy_assignment" "model_deployment_types" {
   })
 }
 
-# FIN-05 : tags obligatoires, sur les groupes de ressources de la plateforme.
-resource "azurerm_policy_definition" "required_tags" {
-  name         = "${local.prefix}-required-tags"
-  display_name = "Plateforme IA : tags obligatoires (FIN-05)"
-  policy_type  = "Custom"
-  mode         = "Indexed"
-  description  = "Signale (ou refuse) toute ressource à laquelle il manque un tag obligatoire."
-  policy_rule  = file("${path.module}/policies/tags-obligatoires.json")
-  parameters = jsonencode({
-    requiredTags = {
-      type     = "Array"
-      metadata = { displayName = "Tags obligatoires" }
-    }
-    effect = {
-      type          = "String"
-      allowedValues = ["Audit", "Deny", "Disabled"]
-      metadata      = { displayName = "Effet" }
-    }
-  })
+# FIN-05 : tags obligatoires sur les groupes de ressources de la plateforme.
+# Définition intégrée « Require a tag on resources », une affectation par tag et par environnement.
+# tag_policy_effect = Audit : évaluation seule (DoNotEnforce), le contrôle bloquant est fait en CI.
+data "azurerm_policy_definition" "require_tag" {
+  display_name = "Require a tag on resources"
 }
 
 resource "azurerm_resource_group_policy_assignment" "required_tags" {
-  for_each             = local.environments
-  name                 = "${local.prefix}-${each.key}-required-tags"
-  display_name         = "Plateforme IA ${each.key} : tags obligatoires (FIN-05)"
-  resource_group_id    = azurerm_resource_group.env[each.key].id
-  policy_definition_id = azurerm_policy_definition.required_tags.id
+  for_each = {
+    for pair in setproduct(keys(local.environments), local.commun.governance.required_tags) :
+    "${pair[0]}|${pair[1]}" => { env = pair[0], tag = pair[1] }
+  }
+  name                 = "${local.prefix}-${each.value.env}-tag-${each.value.tag}"
+  display_name         = "Plateforme IA ${each.value.env} : tag ${each.value.tag} obligatoire (FIN-05)"
+  resource_group_id    = azurerm_resource_group.env[each.value.env].id
+  policy_definition_id = data.azurerm_policy_definition.require_tag.id
+  enforce              = local.commun.governance.tag_policy_effect == "Deny"
   parameters = jsonencode({
-    requiredTags = { value = local.commun.governance.required_tags }
-    effect       = { value = local.commun.governance.tag_policy_effect }
+    tagName = { value = each.value.tag }
   })
 }

@@ -10,7 +10,7 @@ Opération unique, faite à la main par un administrateur. Ensuite, plus personn
 | Un groupe de ressources par environnement | ADR-12 |
 | Identité de pipeline par environnement : application Entra et fédération GitHub, sans secret. Droits limités à son groupe de ressources et à son état. Rôles attribuables limités à `governance.delegable_roles` | ADR-13 |
 | Application Entra « API passerelle » par environnement, avec les rôles `utilisateur`, `admin-offre` et `exploitation` | IAM-01, IAM-03 |
-| Azure Policy sur l'abonnement : régions autorisées, types de déploiement de modèles autorisés, tags obligatoires | CMP-01, ADR-03, FIN-05 |
+| Azure Policy : régions autorisées et types de déploiement de modèles autorisés sur l'abonnement ; tags obligatoires sur les groupes de la plateforme (définition intégrée « Require a tag on resources », une affectation par tag, en évaluation seule tant que `tag_policy_effect` vaut `Audit`) | CMP-01, ADR-03, FIN-05 |
 | Dépôt GitHub, règles de branches, environnements `dev`, `prod-plan` et `prod`, variables des pipelines | ADR-13 |
 
 ## Prérequis
@@ -52,14 +52,15 @@ rm -f terraform.tfstate terraform.tfstate.backup
 # 3. Pousser les quatre branches longues.
 cd ../..
 git remote add origin "$(terraform -chdir=terraform/bootstrap output -raw repository_clone_url)"
-git push -u origin main develop
-git push origin develop:refs/heads/test develop:refs/heads/preprod
+git push -u origin main
+git push origin main:refs/heads/test main:refs/heads/preprod
+git push -u origin develop          # déclenche le premier déploiement de dev
 
 # 4. Second passage : branche par défaut, règles de branches, environnements.
 terraform -chdir=terraform/bootstrap apply -var github_branches_pushed=true
 ```
 
-L'ordre du point 3 compte : `test` et `preprod` partent de `develop`, et `main` reste sur le commit initial. Le premier passage en production suit ensuite le chemin normal : `develop` → `test` → `preprod` → `main`.
+L'ordre du point 3 compte : `main`, `test` et `preprod` partent du commit initial (sans pipeline), et seul le push de `develop` déclenche un déploiement. Ensuite, `test`, `preprod` et `main` rattrapent `develop` par le chemin normal des demandes de changement.
 
 ## Après le bootstrap
 
