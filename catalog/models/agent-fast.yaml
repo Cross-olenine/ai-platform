@@ -21,7 +21,7 @@ pricing:                         # EUR par million de tokens, Data Zone (prix pu
   output: 0.4
 limits:
   capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 2000
-    dev: 100
+    dev: 1000                      # pilote N2 en dev
     prod: 500
 offers: [model-gateway]
 end_of_support: "2027-04-14"

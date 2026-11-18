@@ -19,9 +19,9 @@ pricing:                         # EUR par million de tokens, Data Zone, context
   cached_input: 0.0108
   output: 0.5386                 # contexte long : 0.8079
 limits:
-  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 100
-    dev: 20
-    prod: 80
+  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 100 (goulot du pilote, PO-19)
+    dev: 90                        # pilote N2 en dev ; la production n'est ouverte qu'en V2
+    prod: 10                       # à rééquilibrer (ou quota augmenté) avant la production en V2
 offers: [model-gateway]
 end_of_support: "2028-03-11"
 review_date: "2027-05-18"

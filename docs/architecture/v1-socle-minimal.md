@@ -66,5 +66,5 @@ flowchart LR
 - [ ] le coût estimé du mois est rapproché de la facture Azure, écart expliqué ;
 - [ ] un changement de modèle derrière un alias a été réalisé sans modifier le client ;
 - [ ] l'environnement de développement a été reconstruit entièrement depuis le code ;
-- [ ] une personne extérieure à l'équipe a déployé un changement en suivant la documentation ;
+- [ ] ~~une personne extérieure à l'équipe a déployé un changement en suivant la documentation~~ : reporté en V2 (décision du 18/11/2026) ;
 - [ ] le coût fixe mensuel du socle est connu et suivi.
