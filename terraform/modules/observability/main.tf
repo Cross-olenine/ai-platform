@@ -95,6 +95,16 @@ resource "azurerm_log_analytics_saved_search" "token_usage" {
   query                      = file("${path.module}/queries/token-usage.kql")
 }
 
+resource "azurerm_log_analytics_saved_search" "token_cost" {
+  name                       = "TokenCost"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
+  category                   = "Plateforme IA"
+  display_name               = "Coût estimé depuis les tokens mesurés, y compris streaming (FIN-02, PO-12)"
+  function_alias             = "TokenCost"
+  query                      = file("${path.module}/queries/token-cost.kql")
+  depends_on                 = [azurerm_log_analytics_saved_search.token_usage, azurerm_log_analytics_saved_search.model_pricing]
+}
+
 resource "random_uuid" "workbook" {}
 
 resource "azurerm_application_insights_workbook" "finops" {
@@ -106,7 +116,7 @@ resource "azurerm_application_insights_workbook" "finops" {
   category            = "workbook"
   data_json           = templatefile("${path.module}/queries/workbook.json.tftpl", { workspace_id = azurerm_log_analytics_workspace.this.id })
   tags                = local.tags
-  depends_on          = [azurerm_log_analytics_saved_search.usage_cost]
+  depends_on          = [azurerm_log_analytics_saved_search.usage_cost, azurerm_log_analytics_saved_search.token_cost]
 }
 
 output "workspace_id" {

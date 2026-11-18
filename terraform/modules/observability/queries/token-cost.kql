@@ -1,0 +1,10 @@
+// FIN-02, FIN-06 : coût estimé à partir des tokens comptés par la passerelle (TokenUsage).
+// Couvre les réponses en streaming, dont l'événement d'usage ne porte pas les tokens (PO-12).
+// Agrégé par heure, utilisateur, application et alias ; les tokens en cache ne sont pas distingués (tarif d'entrée plein).
+TokenUsage
+| where metric in ("Prompt Tokens", "Completion Tokens")
+| summarize input_tokens = sumif(tokens, metric == "Prompt Tokens"), output_tokens = sumif(tokens, metric == "Completion Tokens")
+    by TimeGenerated, application_id, model_alias, company_id, user_id
+| join kind=leftouter (ModelPricing) on model_alias
+| extend estimated_cost_eur = (input_tokens * price_input + output_tokens * price_output) / 1000000.0
+| project-away model_alias1
