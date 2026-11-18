@@ -15,7 +15,6 @@ locals {
   prefix    = local.commun.platform.prefix
   loc_short = local.commun.platform.location_short
   suffix    = local.commun.bootstrap.name_suffix
-  repo_full = "${local.commun.github.owner}/${local.commun.github.repository}"
 
   base_tags = merge(local.commun.tags, {
     component   = "bootstrap"
