@@ -8,7 +8,6 @@
 	<trace source="usage-event" severity="information">
 		<message>@{
 			var v = context.Variables;
-			Func&lt;string, string> g = n => v.GetValueOrDefault&lt;string>(n, "");
 			var st = v.GetValueOrDefault&lt;bool>("streaming", false);
 			var hs = v.GetValueOrDefault&lt;int>("http-status", context.Response.StatusCode);
 			long i = -1, c = -1, o = -1, r = -1; int t = -1; bool tr = false;
@@ -19,22 +18,18 @@
 				c = u?["input_tokens_details"]?["cached_tokens"]?.Value&lt;long>() ?? 0;
 				o = u?["output_tokens"]?.Value&lt;long>() ?? -1;
 				r = u?["output_tokens_details"]?["reasoning_tokens"]?.Value&lt;long>() ?? 0;
-				t = (b["output"] as JArray)?.Count(x => x["type"]?.ToString() == "function_call") ?? 0;
+				t = 0;
+				foreach (var x in (b["output"] as JArray) ?? new JArray()) { if (x["type"]?.ToString() == "function_call") { t++; } }
 				tr = b["status"]?.ToString() == "incomplete";
 			}
 			var ms = (long)context.Elapsed.TotalMilliseconds;
 			var e = new JObject();
-			e["trace_id"] = g("trace-id");
+			foreach (var n in new[] { "trace-id", "company-id", "user-id", "application-id", "channel", "session-id", "model-alias", "deployment", "model-version" }) {
+				e[n.Replace("-", "_")] = "" + v.GetValueOrDefault(n, "");
+			}
+			if ((string)e["company_id"] == "") { e["company_id"] = "{{default-company-id}}"; }
 			e["environment"] = "{{environment}}";
-			e["company_id"] = v.GetValueOrDefault&lt;string>("company-id", "{{default-company-id}}");
-			e["user_id"] = g("user-id");
-			e["application_id"] = g("application-id");
-			e["channel"] = g("channel");
 			e["offer_id"] = "{{offer-id}}";
-			e["session_id"] = g("session-id");
-			e["model_alias"] = g("model-alias");
-			e["deployment"] = g("deployment");
-			e["model_version"] = g("model-version");
 			e["input_tokens"] = i;
 			e["cached_input_tokens"] = c;
 			e["output_tokens"] = o;
