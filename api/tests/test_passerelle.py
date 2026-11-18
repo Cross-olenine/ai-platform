@@ -139,8 +139,10 @@ def test_evenement_usage_enregistre(appel, catalogue):
 def test_limite_appels(appel, catalogue):
     limite = catalogue["app"]["limits"]["calls_per_minute"]
     # Appels en parallèle : la limite (catalogue) doit être dépassée en bien moins d'une minute.
+    # En Consumption, le compteur est réparti entre nœuds et approximatif (environ +25 % mesuré, PO-11) :
+    # on envoie 2,5 fois la limite.
     with ThreadPoolExecutor(max_workers=32) as pool:
-        codes = list(pool.map(lambda _: appel(corps("modele-inexistant")).status_code, range(limite + 20)))
+        codes = list(pool.map(lambda _: appel(corps("modele-inexistant")).status_code, range(int(limite * 2.5))))
     assert 429 in codes, "aucune réponse 429 au-delà de la limite"
     r = appel(corps("modele-inexistant"))
     if r.status_code == 429:
