@@ -1,0 +1,48 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "providers": {
+    "aiplat": {
+      "name": "Plateforme IA (prod)",
+      "env": [
+        "AIPLAT_TOKEN"
+      ],
+      "package": "@opencode/ai/providers/openai-compatible/responses",
+      "settings": {
+        "baseURL": "https://apim-aiplat-prod-frc-01.azure-api.net/model-gateway/v1"
+      },
+      "headers": {
+        "Ocp-Apim-Subscription-Key": "{env:AIPLAT_SUBSCRIPTION_KEY}"
+      },
+      "models": {
+        "agent-general": {
+          "name": "agent-general",
+          "limit": {
+            "context": 0,
+            "output": 16384
+          }
+        },
+        "agent-fast": {
+          "name": "agent-fast",
+          "limit": {
+            "context": 0,
+            "output": 4096
+          }
+        }
+      }
+    }
+  },
+  "model": "aiplat/agent-general",
+  "share": "disabled",
+  "policies": [
+    {
+      "action": "provider.use",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "provider.use",
+      "resource": "aiplat",
+      "effect": "allow"
+    }
+  ]
+}
