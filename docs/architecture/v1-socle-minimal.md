@@ -34,7 +34,7 @@ flowchart LR
 | Catalogues | Modèles, agents, environnements : fichiers YAML lus par Terraform. |
 | DevOps | Dépôt unique. Branche principale protégée. Contrôles automatiques sur chaque demande de changement. Déploiement en production sur approbation. 3 états Terraform. |
 | Évaluation | Un jeu de 30 à 50 cas par agent, exécuté avant tout changement de prompt ou de modèle. |
-| Conformité | Résidence UE imposée par règle Azure. Registre simple des cas d'usage. Analyse RGPD du premier cas d'usage. |
+| Conformité | Résidence UE imposée par règle Azure. Registre simple des cas d'usage (`docs/cas-usage/`). L'analyse RGPD n'est pas suivie par la plateforme (CMP-03 abandonnée le 18/11/2026). |
 
 **Explicitement reporté :**
 

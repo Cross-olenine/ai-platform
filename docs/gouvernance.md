@@ -16,7 +16,7 @@ En V1, ces rôles sont cumulés par 2 à 3 personnes. Ils se séparent à mesure
 
 ## Qualification d'une demande
 
-Toute demande remplit une fiche courte avant d'entrer sur la plateforme :
+Toute demande remplit une fiche courte avant d'entrer sur la plateforme. Modèle : `docs/cas-usage/modele-fiche.md` ; registre des cas d'usage : `docs/cas-usage/README.md`.
 
 | Champ | Contenu |
 |---|---|

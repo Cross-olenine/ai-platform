@@ -4,11 +4,11 @@ Les hypothèses sont dans `docs/suivi/hypotheses.md`, les points à vérifier da
 
 ## Décisions attendues de Christophe
 
-1. **Premier cas d'usage** : remplir la fiche de qualification (`docs/gouvernance.md`) pour OpenCode, nommer le propriétaire métier et le budget (déclencheur de `docs/architecture/v1-socle-minimal.md`).
+1. **Premier cas d'usage** : compléter les marqueurs « À COMPLÉTER » de `docs/cas-usage/opencode.md` (utilisateurs, données, signal de réussite, propriétaire, budget).
 2. ~~Compatibilité avec ADR-16~~ : **réglé**. ADR-16 range explicitement l'assistant de développement (Software Factory) dans la colonne « Plateforme ».
 3. ~~Premier adaptateur (CHN-02)~~ : **réglé**. OpenCode est l'adaptateur de la V1. Le bloc agents managés est construit plus tard dans la V1, quand un cas C1 ou C2 arrive.
 4. ~~Deux alias de modèles~~ : **réglé le 18/11/2026**. `agent-general` = gpt-6-luna, `agent-fast` = gpt-4.1-nano (PO-04 vérifié). gpt-4.1-nano arrive en fin de support le 14/04/2027 : successeur à choisir avant.
-5. **Éléments RGPD du premier cas** (CMP-03) : finalité, base légale, durées de conservation. Ce sont des informations que seul le propriétaire peut fournir.
+5. ~~Éléments RGPD du premier cas~~ : **abandonné** le 18/11/2026, la plateforme ne suit pas le RGPD (CMP-03).
 6. **Formulation d'IAM-01** : valider la reformulation imposée par ADR-18 (une clé d'abonnement identifie l'application mais n'authentifie pas).
 8. **Environnement d'apprentissage** : supprimer `rg-foundry-learning-dev` avant le bootstrap. Les règles Azure de la plateforme portent sur tout l'abonnement, et ses déploiements GlobalStandard y seraient non conformes.
 7. **Dépôt GitHub** : sur un compte personnel gratuit, les protections de branches et l'approbation de la production ne sont appliquées que sur un dépôt public. Choisir entre un dépôt public (aucun secret n'est dans Git) et un plan payant. Désigner un second compte approbateur pour la production (ADR-13).
