@@ -42,6 +42,7 @@ flowchart LR
 |---|---|---|
 | Multi-sociétés, refacturation | V2 | Une seule société en V1. Les dimensions sont déjà dans les données (P6). |
 | Environnement de recette | V2 | Deux environnements suffisent pour 1 à 2 cas d'usage. |
+| Mise en production du premier cas d'usage (niveau N3) | V2 | Décision du 18/11/2026 : la V1 se termine sur un pilote N2 en développement. L'environnement de production est construit, mais son déploiement attend un second approbateur (ADR-13). |
 | Agents « code » | V2 | Les agents managés couvrent C1 et C2. |
 | Quotas par utilisateur et par société (MGW-04) | V2 | Les quotas par application couvrent C6 en V1. |
 | Limites et métriques de tokens à la passerelle (MGW-20) | V2 | Non disponibles en niveau Consumption. Passage à un niveau payant en V2. |
@@ -57,7 +58,7 @@ flowchart LR
 
 **Critères de sortie V1 :**
 
-- [ ] un cas d'usage est en production au niveau N3 ;
+- [ ] un cas d'usage est en pilote au niveau N2 (la production et le niveau N3 sont reportés en V2, décision du 18/11/2026) ;
 - [ ] aucun appel à un modèle ne contourne la passerelle (vérifié par test) ;
 - [ ] les limites d'appels par abonnement fonctionnent sur le niveau Consumption (PO-11) ;
 - [ ] Foundry refuse les appels hors passerelle, sans réseau privé (PO-13) ;
