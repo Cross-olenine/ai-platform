@@ -13,7 +13,7 @@ key_vault:
 budget:                            # FIN-03 : notification seulement, jamais de blocage (FIN-04)
   monthly_amount_eur: 50
   thresholds_percent: [50, 80, 100]
-  contact_emails: []               # A_RENSEIGNER
+  contact_emails: [christophe.etienne@outlook.be]
 
 observability:
   retention_days: 30
@@ -21,7 +21,7 @@ observability:
   ingestion_alert_gb: 0.5          # OBS-06 : alerte sur hausse anormale
 
 alerting:                          # OBS-07
-  emails: []                       # A_RENSEIGNER
+  emails: [christophe.etienne@outlook.be]
   availability_percent_min: 95
   error_rate_percent_max: 10
   throttled_calls_max: 50          # réponses 429 par fenêtre de 15 minutes
@@ -29,10 +29,10 @@ alerting:                          # OBS-07
 
 gateway:
   publisher_name: Plateforme IA
-  publisher_email: A_RENSEIGNER@example.invalid
+  publisher_email: christophe.etienne@outlook.be
 
 access:                            # IAM-03 : identifiants d'objet Entra (utilisateurs ou applications)
-  utilisateur: []
+  utilisateur: [db6ffffd-2f3a-48cc-8261-3c9f70e010ed]   # Christophe
   admin-offre: []
   exploitation: []
 
@@ -46,4 +46,4 @@ applications:                      # MGW-03 : une application = un abonnement AP
       calls_per_minute: 30
       calls_per_period: 5000
       period_seconds: 86400        # quota journalier
-    key_readers: []                # identifiants d'objet Entra autorisés à lire la clé d'abonnement
+    key_readers: [db6ffffd-2f3a-48cc-8261-3c9f70e010ed]   # Christophe (identifiants d'objet Entra autorisés à lire la clé d'abonnement)

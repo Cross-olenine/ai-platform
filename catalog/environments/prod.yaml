@@ -13,7 +13,7 @@ key_vault:
 budget:
   monthly_amount_eur: 300          # A_AJUSTER avec le propriétaire du cas d'usage
   thresholds_percent: [50, 80, 100]
-  contact_emails: []
+  contact_emails: [christophe.etienne@outlook.be]
 
 observability:
   retention_days: 90
@@ -21,7 +21,7 @@ observability:
   ingestion_alert_gb: 2
 
 alerting:
-  emails: []
+  emails: [christophe.etienne@outlook.be]
   availability_percent_min: 99
   error_rate_percent_max: 5
   throttled_calls_max: 100
@@ -29,10 +29,10 @@ alerting:
 
 gateway:
   publisher_name: Plateforme IA
-  publisher_email: A_RENSEIGNER@example.invalid
+  publisher_email: christophe.etienne@outlook.be
 
 access:
-  utilisateur: []
+  utilisateur: [db6ffffd-2f3a-48cc-8261-3c9f70e010ed]   # Christophe
   admin-offre: []
   exploitation: []
 
@@ -46,4 +46,4 @@ applications:
       calls_per_minute: 60
       calls_per_period: 20000
       period_seconds: 86400
-    key_readers: []
+    key_readers: [db6ffffd-2f3a-48cc-8261-3c9f70e010ed]   # Christophe
