@@ -6,6 +6,7 @@ Les tests qui appellent un modèle sont ignorés tant qu'aucun alias n'est actif
 import os
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 import requests
@@ -137,7 +138,9 @@ def test_evenement_usage_enregistre(appel, catalogue):
 @pytest.mark.skipif(os.environ.get("RUN_RATE_LIMIT_TEST", "false").lower() != "true", reason="RUN_RATE_LIMIT_TEST")
 def test_limite_appels(appel, catalogue):
     limite = catalogue["app"]["limits"]["calls_per_minute"]
-    codes = [appel(corps("modele-inexistant")).status_code for _ in range(limite + 5)]
+    # Appels en parallèle : la limite (catalogue) doit être dépassée en bien moins d'une minute.
+    with ThreadPoolExecutor(max_workers=32) as pool:
+        codes = list(pool.map(lambda _: appel(corps("modele-inexistant")).status_code, range(limite + 20)))
     assert 429 in codes, "aucune réponse 429 au-delà de la limite"
     r = appel(corps("modele-inexistant"))
     if r.status_code == 429:
