@@ -33,7 +33,7 @@ Premier cas d'usage de la V1. Fiche établie à partir de `docs/cas-usage/modele
 | Élément | Valeur |
 |---|---|
 | Application consommatrice | `opencode` dans `catalog/environments/dev.yaml` et `prod.yaml` |
-| Alias de modèles autorisés | `agent-general` (gpt-6-luna), `agent-fast` (gpt-4.1-nano) |
+| Alias de modèles autorisés | `agent-general` (gpt-6-luna), `agent-fast` (gpt-5-nano) |
 | Limites d'appels (MGW-03) | Dev (pilote) : 150 appels/min, 50 000/jour pour l'application. Prod : 60 appels/min, 20 000/jour (V2). |
 | Capacité des modèles en dev | `agent-general` : 90 000 tokens/min (quota de l'abonnement : 100 000, PO-19). `agent-fast` : 1 000 000 tokens/min. |
 | Canal | Adaptateur OpenCode (`adapters/opencode/`), configuration générée depuis le catalogue (CHN-07) |

@@ -24,8 +24,8 @@
         "agent-fast": {
           "name": "agent-fast",
           "limit": {
-            "context": 1047576,
-            "output": 4096
+            "context": 272000,
+            "output": 8192
           }
         }
       }
