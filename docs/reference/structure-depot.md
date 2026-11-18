@@ -15,6 +15,7 @@ ai-platform/
 │   ├── suivi/                    [V1]
 │   ├── reference/                [V1]
 │   ├── operations/               [V1]
+│   ├── cas-usage/                [V1]  (fiches de qualification et registre, CMP-02)
 │   ├── onboarding/               [V2]
 │   └── troubleshooting/          [V2]
 ├── terraform/
