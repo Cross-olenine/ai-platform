@@ -32,6 +32,7 @@ Le plan validé est découpé en étapes. Chacune donne lieu à une branche `fea
 
 - ADR en attente, dans `docs/decisions/plus-tard/` : ADR-04, 09, 10, 11, 14, 15, 17.
 - **V2** : mise en production d'OpenCode (niveau N3) et second approbateur GitHub (ADR-13).
+- **V2** : déploiement d'un changement par une personne extérieure en suivant la documentation (critère reporté de la V1).
 - **V2** : limites de tokens à la passerelle (MGW-20) et quotas par utilisateur (MGW-04), tous deux sur un niveau payant d'API Management. Choix du niveau à trancher et à chiffrer (PO-03).
 - **V2** : environnements Azure de test et de préproduction, alignés sur les branches `test` et `preprod`.
 - **V2** : statut des agents « code » (PO-02).

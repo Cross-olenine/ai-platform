@@ -42,8 +42,8 @@ applications:                      # MGW-03 : une application = un abonnement AP
     channel: opencode
     owner: ai-platform-team
     allowed_models: [agent-general, agent-fast]
-    limits:
-      calls_per_minute: 30
-      calls_per_period: 5000
+    limits:                        # pilote N2 : environ 50 développeurs (docs/cas-usage/opencode.md)
+      calls_per_minute: 150        # environ 15 développeurs actifs simultanément, 10 appels/min chacun
+      calls_per_period: 50000
       period_seconds: 86400        # quota journalier
     key_readers: [db6ffffd-2f3a-48cc-8261-3c9f70e010ed]   # Christophe (identifiants d'objet Entra autorisés à lire la clé d'abonnement)
