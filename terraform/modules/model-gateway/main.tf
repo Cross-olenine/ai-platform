@@ -107,7 +107,8 @@ resource "azurerm_api_management_policy_fragment" "this" {
   api_management_id = var.api_management_id
   format            = "xml"
   value             = each.value
-  depends_on        = [azurerm_api_management_named_value.gateway, terraform_data.named_values]
+  # Le backend est référencé par le fragment de routage : créé avant, supprimé après (reconstruction de dev).
+  depends_on = [azurerm_api_management_named_value.gateway, terraform_data.named_values, azurerm_api_management_backend.foundry]
 }
 
 # IAM-02 : seule l'identité de la passerelle peut appeler les modèles (PO-13).

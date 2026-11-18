@@ -93,6 +93,36 @@ resource "azurerm_role_assignment" "pipeline_rbac_admin" {
   condition            = local.rbac_condition
 }
 
+# Reconstruction depuis le code (critère de sortie V1) : un environnement sans protection contre la purge
+# (key_vault.purge_protection: false, en pratique dev) peut purger ses ressources supprimées de façon réversible.
+# Ces actions portent sur l'abonnement : rôle personnalisé limité aux trois purges, pour cette seule identité.
+resource "azurerm_role_definition" "purge" {
+  name        = "${local.prefix}-purge-ressources-supprimees"
+  scope       = local.subscription_scope
+  description = "Purge des comptes Foundry, instances API Management et Key Vaults supprimés (reconstruction d'un environnement)."
+
+  permissions {
+    actions = [
+      "Microsoft.CognitiveServices/locations/resourceGroups/deletedAccounts/read",
+      "Microsoft.CognitiveServices/locations/resourceGroups/deletedAccounts/delete",
+      "Microsoft.ApiManagement/locations/deletedservices/read",
+      "Microsoft.ApiManagement/locations/deletedservices/delete",
+      "Microsoft.KeyVault/locations/deletedVaults/read",
+      "Microsoft.KeyVault/locations/deletedVaults/purge/action",
+    ]
+  }
+
+  assignable_scopes = [local.subscription_scope]
+}
+
+resource "azurerm_role_assignment" "pipeline_purge" {
+  for_each           = { for k, e in local.environments : k => e if !e.key_vault.purge_protection }
+  scope              = local.subscription_scope
+  role_definition_id = azurerm_role_definition.purge.role_definition_resource_id
+  principal_id       = azuread_service_principal.pipeline[each.key].object_id
+  principal_type     = "ServicePrincipal"
+}
+
 # Accès à l'état Terraform de son environnement uniquement.
 resource "azurerm_role_assignment" "pipeline_state" {
   for_each             = local.environments

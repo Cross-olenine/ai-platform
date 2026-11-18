@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Enchaîne les 3 états Terraform d'un environnement, dans l'ordre (socle -> observabilite -> passerelle-modeles).
-# Usage : scripts/ci/terraform-etats.sh <dev|prod> <plan|apply|drift>
+# Usage : scripts/ci/terraform-etats.sh <dev|prod> <plan|apply|drift|destroy>
 #   plan  : plan de chaque état (un état non encore créé peut empêcher le plan du suivant au premier déploiement)
 #   apply : plan puis application, état par état
 #   drift : plan sans application ; code de sortie 2 si une dérive est détectée
+#   destroy : suppression des 3 états dans l'ordre inverse (reconstruction de dev uniquement)
 # Variables attendues (pipelines) : ARM_CLIENT_ID, ARM_TENANT_ID, ARM_SUBSCRIPTION_ID, ARM_USE_OIDC=true,
 #   TFSTATE_RESOURCE_GROUP, TFSTATE_STORAGE_ACCOUNT, TF_VAR_gateway_api_client_id.
 set -euo pipefail
@@ -11,6 +12,20 @@ set -euo pipefail
 env="${1:?environnement (dev|prod)}"
 mode="${2:?mode (plan|apply|drift)}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
+
+if [ "$mode" = "destroy" ]; then
+  if [ "$env" = "prod" ]; then echo "::error::destroy refusé sur la production"; exit 1; fi
+  for etat in passerelle-modeles observabilite socle; do
+    dir="$root/terraform/environments/$env/$etat"
+    echo "::group::$env / $etat : destroy"
+    terraform -chdir="$dir" init -input=false \
+      -backend-config="resource_group_name=${TFSTATE_RESOURCE_GROUP}" \
+      -backend-config="storage_account_name=${TFSTATE_STORAGE_ACCOUNT}"
+    terraform -chdir="$dir" destroy -input=false -auto-approve
+    echo "::endgroup::"
+  done
+  exit 0
+fi
 drift=0
 pending=0   # un état précédent a des changements non appliqués (mode plan ou drift)
 
