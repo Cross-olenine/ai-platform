@@ -12,6 +12,7 @@ env="${1:?environnement (dev|prod)}"
 mode="${2:?mode (plan|apply|drift)}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 drift=0
+pending=0   # un état précédent a des changements non appliqués (mode plan ou drift)
 
 for etat in socle observabilite passerelle-modeles; do
   dir="$root/terraform/environments/$env/$etat"
@@ -23,8 +24,13 @@ for etat in socle observabilite passerelle-modeles; do
   terraform -chdir="$dir" plan -input=false -detailed-exitcode -out=tfplan
   code=$?
   set -e
+  if [ "$code" -eq 1 ] && [ "$mode" != "apply" ] && [ "$pending" -eq 1 ]; then
+    echo "::warning::$env/$etat : plan impossible tant que les changements des états précédents ne sont pas appliqués (premier déploiement)."
+    echo "::endgroup::"
+    break
+  fi
   if [ "$code" -eq 1 ]; then echo "::error::plan en échec ($env/$etat)"; exit 1; fi
-  if [ "$code" -eq 2 ]; then drift=1; fi
+  if [ "$code" -eq 2 ]; then drift=1; [ "$mode" != "apply" ] && pending=1; fi
   terraform -chdir="$dir" show -no-color tfplan > "$dir/tfplan.txt"
   if [ "$mode" = "apply" ] && [ "$code" -eq 2 ]; then
     terraform -chdir="$dir" apply -input=false tfplan
