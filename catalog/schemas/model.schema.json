@@ -33,7 +33,14 @@
     "limits": {
       "type": "object", "additionalProperties": false,
       "required": ["capacity_thousand_tpm"],
-      "properties": {"capacity_thousand_tpm": {"type": "integer", "minimum": 1}}
+      "properties": {
+        "capacity_thousand_tpm": {
+          "description": "Capacité du déploiement par environnement, en milliers de tokens par minute. Le quota de l'abonnement est partagé entre environnements.",
+          "type": "object",
+          "required": ["dev", "prod"],
+          "additionalProperties": {"type": "integer", "minimum": 1}
+        }
+      }
     },
     "fallback_alias": {"type": "string"},
     "offers": {"type": "array", "items": {"type": "string"}, "minItems": 1},

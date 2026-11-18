@@ -6,7 +6,7 @@ platform:
   prefix: aiplat                 # préfixe des noms de ressources
   location: francecentral        # région unique de la V1 (hypothèses, 17/11/2026)
   location_short: frc
-  tenant_id: "00000000-0000-0000-0000-000000000000"   # A_RENSEIGNER : tenant Entra ID
+  tenant_id: "17f3e20f-c8e8-423d-b983-fc980c5b8500"   # tenant Entra ID
   default_company_id: societe-principale              # TEN-01 : une seule société en V1
 
 # Tags obligatoires (docs/reference/tags.md). environment, component et criticality

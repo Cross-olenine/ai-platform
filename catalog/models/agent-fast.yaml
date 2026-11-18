@@ -1,26 +1,28 @@
-# Alias rapide et économique (MGW-01). Statut « draft » : non déployé tant que le modèle n'est pas choisi
-# (décision n°4 de docs/suivi/a-faire-v1.md, après vérification PO-04).
+# Alias rapide (MGW-01). Choisi le 18/11/2026 (décision n°4 de docs/suivi/a-faire-v1.md, PO-04 vérifié).
+# Attention : plus cher que agent-general aux prix publics du 18/11/2026 (à réexaminer, PO-18).
 alias: agent-fast
 owner: ai-platform-team
-status: draft                    # draft | active | deprecated
+status: active
 provider: azure
-model: A_CHOISIR                 # nom du modèle Foundry
-model_version: A_CHOISIR
+model: gpt-5-mini
+model_version: "2025-08-07"
 model_format: OpenAI
-deployment_name: agent-fast-v1           # nom technique, jamais visible des consommateurs (MGW-07)
+deployment_name: agent-fast-gpt-5-mini
 deployment_type: DataZoneStandard
 region: francecentral
-protocol: responses              # ADR-06
-context_window: 0                # à renseigner
-max_output_tokens: 4096          # MGW-05 : plafond imposé par la passerelle
-max_request_kb: 512              # MGW-05 : taille maximale de requête
+protocol: responses
+context_window: 272000           # contexte d'entrée publié pour gpt-5-mini : à confirmer (PO-18)
+max_output_tokens: 4096
+max_request_kb: 1024
 capabilities: [streaming, tools]
-pricing:                         # EUR par million de tokens (FIN-02), à renseigner
-  input: 0.0
-  cached_input: 0.0
-  output: 0.0
+pricing:                         # EUR par million de tokens, Data Zone (prix publics Azure, 18/11/2026)
+  input: 0.2469
+  cached_input: 0.0247
+  output: 1.975
 limits:
-  capacity_thousand_tpm: 10      # capacité du déploiement, en milliers de tokens par minute
+  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 300
+    dev: 30
+    prod: 150
 offers: [model-gateway]
-end_of_support: "2099-12-31"     # à renseigner
-review_date: "2027-05-17"
+end_of_support: "2027-07-13"
+review_date: "2027-03-01"

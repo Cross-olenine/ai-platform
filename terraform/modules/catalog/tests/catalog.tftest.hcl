@@ -1,4 +1,4 @@
-# CAT-04 : le catalogue réel, encore incomplet (GUID nuls), doit être refusé ; le catalogue de test est accepté.
+# CAT-04 : un catalogue incomplet (GUID nul) est refusé ; le catalogue de test est accepté.
 
 run "catalogue_de_test_accepte" {
   command = plan
@@ -19,7 +19,7 @@ run "catalogue_de_test_accepte" {
 run "catalogue_incomplet_refuse" {
   command = plan
   variables {
-    catalog_path = "../../../catalog"
+    catalog_path = "../../tests/fixtures/catalogue-incomplet"
     environment  = "dev"
   }
   expect_failures = [terraform_data.checks]

@@ -1,5 +1,5 @@
 name: prod
-subscription_id: "00000000-0000-0000-0000-000000000000"   # A_RENSEIGNER (même abonnement que dev en V1, ADR-12)
+subscription_id: "b76cb57a-94d6-48d6-80b1-8072f6ab445e"   # (même abonnement que dev en V1, ADR-12)
 criticality: high
 name_suffix: "01"
 

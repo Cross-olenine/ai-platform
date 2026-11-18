@@ -25,7 +25,12 @@ locals {
   }
 
   # Seuls les modèles actifs sont déployés et routés (MGW-02 : liste blanche).
-  active_models = { for k, m in local.all_models : m.alias => m if m.status == "active" }
+  # La capacité est résolue pour l'environnement demandé (quota partagé entre environnements).
+  active_models = {
+    for k, m in local.all_models : m.alias => merge(m, {
+      limits = merge(m.limits, { capacity_thousand_tpm = try(m.limits.capacity_thousand_tpm[var.environment], 0) })
+    }) if m.status == "active"
+  }
 
   prefix    = local.commun.platform.prefix
   loc_short = local.commun.platform.location_short
@@ -55,6 +60,10 @@ resource "terraform_data" "checks" {
     precondition {
       condition     = local.env.subscription_id != local.null_guid && local.commun.platform.tenant_id != local.null_guid
       error_message = "Renseigner tenant_id (commun.yaml) et subscription_id (${var.environment}.yaml)."
+    }
+    precondition {
+      condition     = !strcontains(jsonencode([local.commun.tags, local.env.gateway, local.env.budget, local.env.alerting]), "A_RENSEIGNER")
+      error_message = "Des valeurs « A_RENSEIGNER » restent dans catalog/environments/ (tags, gateway, budget, alerting)."
     }
     precondition {
       condition = alltrue([

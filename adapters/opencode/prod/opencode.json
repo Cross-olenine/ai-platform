@@ -17,14 +17,14 @@
         "agent-general": {
           "name": "agent-general",
           "limit": {
-            "context": 0,
+            "context": 128000,
             "output": 16384
           }
         },
         "agent-fast": {
           "name": "agent-fast",
           "limit": {
-            "context": 0,
+            "context": 272000,
             "output": 4096
           }
         }

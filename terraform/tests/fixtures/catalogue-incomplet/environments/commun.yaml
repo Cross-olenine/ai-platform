@@ -1,0 +1,68 @@
+# Jeu de test : catalogue volontairement incomplet (abonnement nul), doit être refusé.
+# Paramètres communs à tous les environnements.
+# Un fichier d'environnement (dev.yaml, prod.yaml) peut surcharger une clé de premier niveau.
+# Les valeurs « A_RENSEIGNER » ou le GUID nul bloquent volontairement Terraform (préconditions).
+
+platform:
+  prefix: aiplat                 # préfixe des noms de ressources
+  location: francecentral        # région unique de la V1 (hypothèses, 17/11/2026)
+  location_short: frc
+  tenant_id: "11111111-1111-1111-1111-111111111111"   # A_RENSEIGNER : tenant Entra ID
+  default_company_id: societe-principale              # TEN-01 : une seule société en V1
+
+# Tags obligatoires (docs/reference/tags.md). environment, component et criticality
+# sont ajoutés par chaque module ou environnement.
+tags:
+  offer: model-gateway
+  owner: ai-platform-team
+  cost-center: CC-0000
+  managed-by: terraform
+  data-classification: internal
+  service-id: AI-SVC-000
+  lifecycle: active
+
+governance:
+  allowed_locations: [francecentral]
+  allowed_model_deployment_types: [DataZoneStandard]   # ADR-03, CMP-01
+  required_tags: [environment, offer, component, owner, cost-center, managed-by, criticality, data-classification, service-id, lifecycle]
+  tag_policy_effect: Audit        # Audit en V1 ; contrôle bloquant fait en CI (FIN-05)
+  # Rôles que l'identité de pipeline d'un environnement peut attribuer dans son groupe de ressources.
+  delegable_roles:
+    - Cognitive Services OpenAI User     # passerelle -> Foundry (IAM-02)
+    - Key Vault Secrets Officer          # pipeline -> écriture des clés d'abonnement
+    - Key Vault Secrets User             # lecteurs de la clé d'abonnement OpenCode
+    - Monitoring Metrics Publisher
+
+bootstrap:
+  name_suffix: "01"              # rend les noms globalement uniques ; changer si collision
+
+gateway_api:
+  # Clients autorisés à demander un jeton pour l'API de la passerelle sans consentement.
+  # 04b07795-... = Azure CLI (utilisé par scripts/opencode-token, PO-14).
+  preauthorized_client_ids: ["04b07795-8ddb-461a-bbee-02f9e1bf7b46"]
+
+# GRD-01, GRD-02 : politique de filtrage de contenu appliquée à tous les déploiements.
+content_filter:
+  base_policy: Microsoft.DefaultV2
+  severity_threshold: Medium      # Low | Medium | High
+  harm_categories: [Hate, Sexual, Violence, SelfHarm]
+  prompt_shields: true            # détection d'injection directe (Jailbreak)
+  protected_material: true
+
+# GRD-03 : paramètres bornés ou interdits par la passerelle.
+gateway_policy:
+  allowed_tool_types: [function, custom]   # outils hébergés (recherche web, code...) refusés en V1
+  forbidden_parameters: [background]       # traitement asynchrone : V3
+  backend_timeout_seconds: 300             # réponses longues d'un assistant de code
+
+github:
+  owner: exemple            # compte GitHub qui héberge le dépôt
+  repository: ai-platform
+  visibility: public             # compte gratuit : protections appliquées seulement en public (a-faire-v1, point 7)
+  required_approvals: 1          # 1 approbation par demande de changement (0 tant que l'équipe compte une seule personne)
+  prod_reviewers: []             # identifiants GitHub des approbateurs de la production (distincts de l'auteur, ADR-13)
+  required_status_check: controles   # nom du job de .github/workflows/pr.yml
+  branches:
+    integration: develop
+    promotion: [test, preprod]
+    production: main

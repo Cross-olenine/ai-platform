@@ -1,0 +1,49 @@
+name: dev
+subscription_id: "00000000-0000-0000-0000-000000000000"   # A_RENSEIGNER (ADR-12 : paramètre d'environnement)
+criticality: low
+name_suffix: "01"                  # ADR-12 : permet la coexistence de deux instances
+
+github:
+  deploy_branch: develop           # branche qui déploie cet environnement
+  plan_on_pull_request: true       # l'identité de dev produit les plans des demandes de changement
+
+key_vault:
+  purge_protection: false            # false en dev : reconstruction complète possible (critère de sortie V1)
+
+budget:                            # FIN-03 : notification seulement, jamais de blocage (FIN-04)
+  monthly_amount_eur: 50
+  thresholds_percent: [50, 80, 100]
+  contact_emails: []               # A_RENSEIGNER
+
+observability:
+  retention_days: 30
+  daily_quota_gb: 1                # OBS-06 : plafond quotidien d'ingestion
+  ingestion_alert_gb: 0.5          # OBS-06 : alerte sur hausse anormale
+
+alerting:                          # OBS-07
+  emails: []                       # A_RENSEIGNER
+  availability_percent_min: 95
+  error_rate_percent_max: 10
+  throttled_calls_max: 50          # réponses 429 par fenêtre de 15 minutes
+  latency_p95_ms_max: 30000
+
+gateway:
+  publisher_name: Plateforme IA
+  publisher_email: plateforme@example.com
+
+access:                            # IAM-03 : identifiants d'objet Entra (utilisateurs ou applications)
+  utilisateur: []
+  admin-offre: []
+  exploitation: []
+
+applications:                      # MGW-03 : une application = un abonnement API Management
+  - id: opencode
+    display_name: OpenCode (Software Factory)
+    channel: opencode
+    owner: ai-platform-team
+    allowed_models: [agent-general, agent-fast]
+    limits:
+      calls_per_minute: 30
+      calls_per_period: 5000
+      period_seconds: 86400        # quota journalier
+    key_readers: []                # identifiants d'objet Entra autorisés à lire la clé d'abonnement

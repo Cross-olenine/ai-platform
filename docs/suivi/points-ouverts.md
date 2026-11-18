@@ -9,7 +9,7 @@ Registre unique des points à vérifier. Un numéro n'est jamais réutilisé ni 
 | PO-01 | Les appels aux modèles d'un agent managé passent par la passerelle et produisent les mêmes événements d'usage. Piste : connexion « modèle via API Management » de Foundry Agent Service (préversion en novembre 2026). | V1 (phase agents) | ADR-01, AGT-04 | Ouvert | |
 | PO-02 | Statut de disponibilité générale des agents « code » dans Foundry Agent Service. | V2 | ADR-01 | Ouvert | |
 | PO-03 | Choix et chiffrage du niveau payant d'API Management de la V2. | V2 | ADR-18 | Ouvert | |
-| PO-04 | Disponibilité, en déploiement Data Zone Standard EU depuis France Central, des modèles candidats aux deux alias. | V1 | ADR-03 | Ouvert | |
+| PO-04 | Disponibilité, en déploiement Data Zone Standard EU depuis France Central, des modèles candidats aux deux alias. | V1 | ADR-03 | Vérifié | 18/11/2026 : gpt-6-luna (quota 100) et gpt-5-mini (quota 300) disponibles en Data Zone Standard ; quota partagé entre dev et prod. |
 | PO-05 | Licence nécessaire à l'identité d'agent. | V3 | — | Ouvert | |
 | PO-06 | Non attribué. | — | — | — | |
 | PO-07 | Coût fixe mensuel du socle V1 : API Management Consumption, Log Analytics, Application Insights, Key Vault, stockage des états, minutes de pipelines. | V1 | FIN-07 | Ouvert | |
@@ -23,3 +23,4 @@ Registre unique des points à vérifier. Un numéro n'est jamais réutilisé ni 
 | PO-15 | En streaming, le champ `model` des événements renvoyés par Foundry expose le nom réel du modèle (MGW-07) ; il n'est réécrit que pour les réponses complètes. Vérifier aussi le stockage des réponses côté Foundry (`store`, rétention) au regard de CMP-03. | V1 | MGW-07, CMP-03 | Ouvert | |
 | PO-16 | Les expressions des policies (`Func<>`, `SHA256`, `Regex`) sont acceptées par API Management, et la taille réelle de la policy assemblée reste sous 16 Kio en Consumption (estimation prudente contrôlée par Terraform). | V1 | API-01, ADR-18 | Ouvert | |
 | PO-17 | La métrique Foundry `TokenTransaction` (dimension `ModelDeploymentName`) convient à l'alerte de consommation du quota à 80 %. | V1 | RES-03 | Ouvert | |
+| PO-18 | Catalogue des modèles : fenêtres de contexte réelles (non publiées par l'API des modèles), tarification « contexte long » et écriture en cache de gpt-6-luna (non modélisées par le coût estimé), et intérêt d'un modèle réellement économique pour `agent-fast` (gpt-5-mini coûte plus cher que gpt-6-luna au 18/11/2026). | V1 | FIN-02, MGW-01 | Ouvert | |

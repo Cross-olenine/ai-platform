@@ -1,0 +1,28 @@
+# Alias généraliste (MGW-01). Statut « draft » : non déployé tant que le modèle n'est pas choisi
+# (décision n°4 de docs/suivi/a-faire-v1.md, après vérification PO-04).
+alias: agent-general
+owner: ai-platform-team
+status: active                    # draft | active | deprecated
+provider: azure
+model: modele-test                 # nom du modèle Foundry
+model_version: "2026-01-01"
+model_format: OpenAI
+deployment_name: agent-general-v1           # nom technique, jamais visible des consommateurs (MGW-07)
+deployment_type: DataZoneStandard
+region: francecentral
+protocol: responses              # ADR-06
+context_window: 128000                # à renseigner
+max_output_tokens: 16384          # MGW-05 : plafond imposé par la passerelle
+max_request_kb: 512              # MGW-05 : taille maximale de requête
+capabilities: [streaming, tools]
+pricing:                         # EUR par million de tokens (FIN-02), à renseigner
+  input: 1.5
+  cached_input: 0.0
+  output: 6.0
+limits:
+  capacity_thousand_tpm:
+    dev: 10
+    prod: 10
+offers: [model-gateway]
+end_of_support: "2099-12-31"     # à renseigner
+review_date: "2027-05-17"

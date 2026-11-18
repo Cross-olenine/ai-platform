@@ -1,5 +1,5 @@
 name: dev
-subscription_id: "00000000-0000-0000-0000-000000000000"   # A_RENSEIGNER (ADR-12 : paramètre d'environnement)
+subscription_id: "b76cb57a-94d6-48d6-80b1-8072f6ab445e"   # (ADR-12 : paramètre d'environnement)
 criticality: low
 name_suffix: "01"                  # ADR-12 : permet la coexistence de deux instances
 

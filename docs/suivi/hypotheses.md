@@ -12,4 +12,5 @@
 | Réseau privé en V2 | Confirmée (ADR-07) |
 | Niveau Consumption pour API Management en V1 | Confirmée (ADR-18, remplace ADR-02) |
 | Région de la V1 : France Central | Confirmée le 17 novembre 2026 |
+| Abonnement de la V1 dédié à la plateforme (règles Azure sur tout l'abonnement) | Confirmée le 18 novembre 2026, après suppression de l'environnement d'apprentissage |
 | Licences Microsoft 365 Copilot | Levée |

@@ -1,26 +1,27 @@
-# Alias généraliste (MGW-01). Statut « draft » : non déployé tant que le modèle n'est pas choisi
-# (décision n°4 de docs/suivi/a-faire-v1.md, après vérification PO-04).
+# Alias généraliste (MGW-01). Choisi le 18/11/2026 (décision n°4 de docs/suivi/a-faire-v1.md, PO-04 vérifié).
 alias: agent-general
 owner: ai-platform-team
-status: draft                    # draft | active | deprecated
+status: active                   # draft | active | deprecated
 provider: azure
-model: A_CHOISIR                 # nom du modèle Foundry
-model_version: A_CHOISIR
+model: gpt-6-luna
+model_version: "2026-09-22"
 model_format: OpenAI
-deployment_name: agent-general-v1           # nom technique, jamais visible des consommateurs (MGW-07)
+deployment_name: agent-general-gpt-6-luna   # nom technique, jamais visible des consommateurs (MGW-07)
 deployment_type: DataZoneStandard
 region: francecentral
 protocol: responses              # ADR-06
-context_window: 0                # à renseigner
-max_output_tokens: 16384          # MGW-05 : plafond imposé par la passerelle
-max_request_kb: 512              # MGW-05 : taille maximale de requête
+context_window: 128000           # valeur prudente, non publiée par l'API des modèles : à confirmer (PO-18)
+max_output_tokens: 16384         # MGW-05 : plafond imposé par la passerelle
+max_request_kb: 1024             # MGW-05 : taille maximale de requête (contexte d'un assistant de code)
 capabilities: [streaming, tools]
-pricing:                         # EUR par million de tokens (FIN-02), à renseigner
-  input: 0.0
-  cached_input: 0.0
-  output: 0.0
+pricing:                         # EUR par million de tokens, Data Zone, contexte court (prix publics Azure, 18/11/2026)
+  input: 0.1077                  # contexte long : 0.2154 ; écriture en cache : 0.1347 (non modélisée, PO-18)
+  cached_input: 0.0108
+  output: 0.5386                 # contexte long : 0.8079
 limits:
-  capacity_thousand_tpm: 10      # capacité du déploiement, en milliers de tokens par minute
+  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 100
+    dev: 20
+    prod: 80
 offers: [model-gateway]
-end_of_support: "2099-12-31"     # à renseigner
-review_date: "2027-05-17"
+end_of_support: "2028-03-11"
+review_date: "2027-05-18"
