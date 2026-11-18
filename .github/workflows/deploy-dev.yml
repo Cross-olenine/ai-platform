@@ -1,0 +1,45 @@
+# Déploiement automatique en développement depuis develop, puis tests de l'API (API-05).
+name: deploy-dev
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    environment: dev
+    env:
+      TF_IN_AUTOMATION: "true"
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_DEV }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TFSTATE_RESOURCE_GROUP: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+      TFSTATE_STORAGE_ACCOUNT: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+      TF_VAR_gateway_api_client_id: ${{ vars.GATEWAY_API_CLIENT_ID_DEV }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Appliquer dev
+        run: scripts/ci/terraform-etats.sh dev apply
+
+  tests-api:
+    needs: deploy
+    uses: ./.github/workflows/tests-api.yml
+    with:
+      environment: dev
+      github_environment: dev
+    secrets: inherit

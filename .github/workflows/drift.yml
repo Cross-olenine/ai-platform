@@ -1,0 +1,52 @@
+# Détection de dérive mensuelle : plan sans application (devops-genaiops.md, V1).
+# La planification s'exécute sur la branche par défaut (develop) ; la production est contrôlée depuis main,
+# seule branche autorisée à utiliser l'identité de production (ADR-13).
+name: drift
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [dev, prod]
+        default: dev
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+
+jobs:
+  lancer-prod:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Lancer le contrôle de la production depuis main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run drift.yml --repo "${{ github.repository }}" --ref main -f environment=prod
+
+  drift:
+    if: github.event_name == 'schedule' || inputs.environment == 'dev' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: ${{ (github.event_name == 'schedule' || inputs.environment == 'dev') && 'dev' || 'prod-plan' }}
+    env:
+      TF_IN_AUTOMATION: "true"
+      AIPLAT_ENV: ${{ (github.event_name == 'schedule' || inputs.environment == 'dev') && 'dev' || 'prod' }}
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ (github.event_name == 'schedule' || inputs.environment == 'dev') && vars.AZURE_CLIENT_ID_DEV || vars.AZURE_CLIENT_ID_PROD }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TFSTATE_RESOURCE_GROUP: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+      TFSTATE_STORAGE_ACCOUNT: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+      TF_VAR_gateway_api_client_id: ${{ (github.event_name == 'schedule' || inputs.environment == 'dev') && vars.GATEWAY_API_CLIENT_ID_DEV || vars.GATEWAY_API_CLIENT_ID_PROD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Plan sans application
+        run: scripts/ci/terraform-etats.sh "$AIPLAT_ENV" drift

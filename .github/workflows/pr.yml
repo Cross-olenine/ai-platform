@@ -1,0 +1,134 @@
+# Contrôles automatiques de chaque demande de changement (devops-genaiops.md, V1).
+# Le job « controles » est le contrôle obligatoire des règles de branches (bootstrap/github.tf).
+name: pr
+
+on:
+  pull_request:
+    branches: [develop, test, preprod, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  controles:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Promotion depuis la branche attendue
+        run: scripts/ci/verifier-promotion.sh pr "${{ github.base_ref }}" "${{ github.head_ref }}"
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Outils de contrôle
+        run: |
+          pip install --quiet check-jsonschema==0.39.0 pyyaml==6.0.3
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz | tar -xz gitleaks
+          curl -sSL https://github.com/terraform-linters/tflint/releases/download/v0.65.0/tflint_linux_amd64.zip -o tflint.zip && unzip -q tflint.zip && rm tflint.zip
+
+      - name: Absence de secrets (KV-02)
+        run: ./gitleaks git --redact --no-banner --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+
+      - name: Schémas des catalogues (CAT-01, CAT-04)
+        run: |
+          check-jsonschema --schemafile catalog/schemas/commun.schema.json catalog/environments/commun.yaml
+          check-jsonschema --schemafile catalog/schemas/environment.schema.json catalog/environments/dev.yaml catalog/environments/prod.yaml
+          check-jsonschema --schemafile catalog/schemas/model.schema.json catalog/models/*.yaml
+          if ls catalog/agents/*.yaml >/dev/null 2>&1; then check-jsonschema --schemafile catalog/schemas/agent.schema.json catalog/agents/*.yaml; fi
+
+      - name: Format Terraform
+        run: terraform fmt -check -recursive terraform
+
+      - name: Validation Terraform
+        run: |
+          for d in terraform/bootstrap terraform/environments/*/*; do
+            echo "== $d"
+            terraform -chdir="$d" init -backend=false -input=false >/dev/null
+            terraform -chdir="$d" validate
+          done
+
+      - name: tflint
+        run: |
+          ./tflint --init --config "$PWD/.tflint.hcl"
+          for d in terraform/bootstrap terraform/stacks/* terraform/modules/*; do ./tflint --chdir="$d" --config "$PWD/.tflint.hcl"; done
+
+      - name: Tests Terraform hors ligne (catalogue, policies, limite 16 Kio)
+        run: |
+          for d in terraform/modules/catalog terraform/stacks/*; do
+            echo "== $d"
+            terraform -chdir="$d" init -backend=false -input=false >/dev/null
+            terraform -chdir="$d" test
+          done
+
+      - name: Tags obligatoires (FIN-05)
+        run: |
+          terraform -chdir=terraform/stacks/passerelle-modeles providers schema -json > /tmp/schema.json
+          python scripts/ci/verifier-tags.py /tmp/schema.json terraform
+
+      - name: Racines dev et prod identiques
+        run: scripts/ci/verifier-racines.sh
+
+      - name: Policies XML bien formées
+        run: for f in api/policies/fragments/*.xml; do python -c "import sys,xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" "$f"; done
+
+      - name: Configuration OpenCode à jour (CHN-07)
+        run: |
+          python scripts/opencode/generer-config.py
+          git diff --exit-code adapters/opencode/
+
+  plan-dev:
+    # Plan de l'environnement de développement, publié dans la demande de changement.
+    if: github.base_ref == 'develop' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: controles
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    env:
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_DEV }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TFSTATE_RESOURCE_GROUP: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+      TFSTATE_STORAGE_ACCOUNT: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+      TF_VAR_gateway_api_client_id: ${{ vars.GATEWAY_API_CLIENT_ID_DEV }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Plan dev
+        run: scripts/ci/terraform-etats.sh dev plan
+      - name: Publier le plan
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### Plan Terraform : dev"
+            for etat in socle observabilite passerelle-modeles; do
+              f="terraform/environments/dev/$etat/tfplan.txt"
+              echo "<details><summary>$etat</summary>"; echo; echo '```'
+              [ -f "$f" ] && tail -c 20000 "$f" || echo "plan indisponible"
+              echo '```'; echo "</details>"
+            done
+          } > plan.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file plan.md

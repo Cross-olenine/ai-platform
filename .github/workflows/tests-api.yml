@@ -1,0 +1,44 @@
+# Tests automatisés de la passerelle (API-05) et prototypes PO-11 à PO-13, contre un environnement déployé.
+name: tests-api
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      github_environment:
+        type: string
+        required: false
+        default: ""
+      run_rate_limit_test:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    environment: ${{ inputs.github_environment }}
+    env:
+      AIPLAT_ENV: ${{ inputs.environment }}
+      RUN_RATE_LIMIT_TEST: ${{ inputs.run_rate_limit_test }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ inputs.environment == 'prod' && vars.AZURE_CLIENT_ID_PROD || vars.AZURE_CLIENT_ID_DEV }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dépendances
+        run: pip install --quiet -r api/tests/requirements.txt
+      - name: Tests de la passerelle
+        env:
+          GATEWAY_API_CLIENT_ID: ${{ inputs.environment == 'prod' && vars.GATEWAY_API_CLIENT_ID_PROD || vars.GATEWAY_API_CLIENT_ID_DEV }}
+        run: pytest -v api/tests

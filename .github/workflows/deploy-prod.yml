@@ -1,0 +1,71 @@
+# Déploiement en production depuis main, après approbation d'une personne distincte de l'auteur (ADR-13, CMP-05).
+name: deploy-prod
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  TF_IN_AUTOMATION: "true"
+  ARM_USE_OIDC: "true"
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_PROD }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TFSTATE_RESOURCE_GROUP: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+  TFSTATE_STORAGE_ACCOUNT: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+  TF_VAR_gateway_api_client_id: ${{ vars.GATEWAY_API_CLIENT_ID_PROD }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    environment: prod-plan
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Même arbre que preprod
+        run: scripts/ci/verifier-promotion.sh merge
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Plan prod (à relire avant approbation)
+        run: scripts/ci/terraform-etats.sh prod plan
+      - name: Résumé du plan
+        if: always()
+        run: |
+          for etat in socle observabilite passerelle-modeles; do
+            f="terraform/environments/prod/$etat/tfplan.txt"
+            { echo "### prod / $etat"; echo '```'; [ -f "$f" ] && tail -c 30000 "$f" || echo "plan indisponible"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          done
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-24.04
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Appliquer prod
+        run: scripts/ci/terraform-etats.sh prod apply
+
+  controle:
+    # Contrôle après déploiement (devops-genaiops.md, règle 7) ; sans test de limite pour ne pas consommer le quota.
+    needs: apply
+    uses: ./.github/workflows/tests-api.yml
+    with:
+      environment: prod
+      github_environment: prod-plan
+      run_rate_limit_test: false
+    secrets: inherit

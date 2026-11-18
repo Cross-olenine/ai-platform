@@ -1,0 +1,29 @@
+# Promotion develop -> test -> preprod (docs/pratiques/devops-genaiops.md, « Modèle de branches »).
+# Aucune ressource Azure propre en V1 : le même arbre est revalidé contre l'environnement de développement.
+name: promote
+
+on:
+  push:
+    branches: [test, preprod]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  arbre:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Même arbre que la branche source
+        run: scripts/ci/verifier-promotion.sh merge
+
+  tests-api:
+    needs: arbre
+    uses: ./.github/workflows/tests-api.yml
+    with:
+      environment: dev
+      run_rate_limit_test: false
+    secrets: inherit
