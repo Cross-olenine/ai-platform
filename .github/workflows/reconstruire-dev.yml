@@ -1,0 +1,51 @@
+# Reconstruction complète de l'environnement de développement depuis le code (critère de sortie V1).
+# Suppression des 3 états (purge des ressources supprimées de façon réversible), puis recréation et tests.
+name: reconstruire-dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Taper « reconstruire-dev » pour confirmer la suppression de dev"
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  reconstruire:
+    if: inputs.confirmation == 'reconstruire-dev' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-24.04
+    environment: dev
+    env:
+      TF_IN_AUTOMATION: "true"
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID_DEV }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TFSTATE_RESOURCE_GROUP: ${{ vars.TFSTATE_RESOURCE_GROUP }}
+      TFSTATE_STORAGE_ACCOUNT: ${{ vars.TFSTATE_STORAGE_ACCOUNT }}
+      TF_VAR_gateway_api_client_id: ${{ vars.GATEWAY_API_CLIENT_ID_DEV }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.17"
+          terraform_wrapper: false
+      - name: Supprimer dev
+        run: scripts/ci/terraform-etats.sh dev destroy
+      - name: Recréer dev depuis le code
+        run: scripts/ci/terraform-etats.sh dev apply
+
+  tests-api:
+    needs: reconstruire
+    uses: ./.github/workflows/tests-api.yml
+    with:
+      environment: dev
+      github_environment: dev
+    secrets: inherit
