@@ -1,0 +1,10 @@
+// Tokens comptés par la policy llm-emit-token-metric, y compris pour les réponses en streaming (PO-12).
+// Agrégé par heure : les métriques restent à faible cardinalité (OBS-04).
+AppMetrics
+| where Name in ("Prompt Tokens", "Completion Tokens", "Total Tokens")
+| extend
+    application_id = tostring(Properties["application_id"]),
+    model_alias = tostring(Properties["model_alias"]),
+    company_id = tostring(Properties["company_id"]),
+    user_id = tostring(Properties["user_id"])
+| summarize tokens = sum(Sum) by bin(TimeGenerated, 1h), metric = Name, application_id, model_alias, company_id, user_id

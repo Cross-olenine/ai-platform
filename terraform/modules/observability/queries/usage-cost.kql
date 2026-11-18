@@ -1,0 +1,9 @@
+// FIN-02 : coût estimé par requête, à partir des tarifs du catalogue.
+// Coût inconnu (null) quand les tokens ne sont pas connus à la passerelle (streaming, PO-12).
+UsageEvents
+| join kind=leftouter (ModelPricing) on model_alias
+| extend known_tokens = input_tokens >= 0 and output_tokens >= 0
+| extend estimated_cost_eur = iff(known_tokens,
+    ((input_tokens - cached_input_tokens) * price_input + cached_input_tokens * price_cached_input + output_tokens * price_output) / 1000000.0,
+    real(null))
+| project-away model_alias1, known_tokens

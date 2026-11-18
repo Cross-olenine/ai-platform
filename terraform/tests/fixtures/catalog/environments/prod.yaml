@@ -1,0 +1,49 @@
+name: prod
+subscription_id: "11111111-1111-1111-1111-111111111111"   # A_RENSEIGNER (même abonnement que dev en V1, ADR-12)
+criticality: high
+name_suffix: "01"
+
+github:
+  deploy_branch: main
+  plan_on_pull_request: false      # ADR-13 : l'identité de production n'est utilisable que depuis main
+
+key_vault:
+  purge_protection: true            # protection contre la purge en production
+
+budget:
+  monthly_amount_eur: 300          # A_AJUSTER avec le propriétaire du cas d'usage
+  thresholds_percent: [50, 80, 100]
+  contact_emails: []
+
+observability:
+  retention_days: 90
+  daily_quota_gb: 5
+  ingestion_alert_gb: 2
+
+alerting:
+  emails: []
+  availability_percent_min: 99
+  error_rate_percent_max: 5
+  throttled_calls_max: 100
+  latency_p95_ms_max: 30000
+
+gateway:
+  publisher_name: Plateforme IA
+  publisher_email: plateforme@example.com
+
+access:
+  utilisateur: []
+  admin-offre: []
+  exploitation: []
+
+applications:
+  - id: opencode
+    display_name: OpenCode (Software Factory)
+    channel: opencode
+    owner: ai-platform-team
+    allowed_models: [agent-general, agent-fast]
+    limits:
+      calls_per_minute: 60
+      calls_per_period: 20000
+      period_seconds: 86400
+    key_readers: []

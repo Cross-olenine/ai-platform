@@ -1,0 +1,35 @@
+// FIN-01 : un événement d'usage par requête, au format de docs/reference/evenement-usage.md.
+// Écrit par le fragment de policy « evenement-usage » (policy trace -> Application Insights -> AppTraces).
+// project_id, agent_id, agent_version et retries ne sont pas émis par la passerelle en V1 (pas de projet ni d agent) : valeurs vides ou 0.
+// Les tokens valent -1 quand ils ne sont pas connus à la passerelle (réponse en streaming) : voir TokenUsage.
+AppTraces
+| where tostring(Properties["event"]) == "usage-event"
+| extend e = parse_json(Message)
+| project
+    timestamp = TimeGenerated,
+    trace_id = tostring(e.trace_id),
+    environment = tostring(e.environment),
+    company_id = tostring(e.company_id),
+    user_id = tostring(e.user_id),
+    application_id = tostring(e.application_id),
+    channel = tostring(e.channel),
+    offer_id = tostring(e.offer_id),
+    project_id = tostring(e.project_id),
+    session_id = tostring(e.session_id),
+    agent_id = tostring(e.agent_id),
+    agent_version = tostring(e.agent_version),
+    model_alias = tostring(e.model_alias),
+    deployment = tostring(e.deployment),
+    model_version = tostring(e.model_version),
+    input_tokens = tolong(e.input_tokens),
+    cached_input_tokens = tolong(e.cached_input_tokens),
+    output_tokens = tolong(e.output_tokens),
+    reasoning_tokens = tolong(e.reasoning_tokens),
+    tool_calls = toint(e.tool_calls),
+    status = tostring(e.status),
+    http_status = toint(e.http_status),
+    latency_ms = tolong(e.latency_ms),
+    time_to_first_token_ms = tolong(e.time_to_first_token_ms),
+    retries = coalesce(toint(e.retries), 0),
+    truncated = tobool(e.truncated),
+    streaming = tobool(e.streaming)

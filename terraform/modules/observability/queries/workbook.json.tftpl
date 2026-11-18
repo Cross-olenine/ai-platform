@@ -1,0 +1,86 @@
+${jsonencode({
+  version = "Notebook/1.0"
+  items = [
+    {
+      type = 1
+      name = "titre"
+      content = { json = "## Plateforme IA : usage et coût\nSource : fonctions `UsageEvents`, `UsageCost` et `TokenUsage` (FIN-01, FIN-02, FIN-06). Coût estimé, à rapprocher chaque mois de la facture Azure." }
+    },
+    {
+      type = 9
+      name = "parametres"
+      content = {
+        version = "KqlParameterItem/1.0"
+        parameters = [{
+          id = "6a8c1e1f-1f0e-4c39-9c51-2b6d0e5f9a01"
+          name = "Periode"
+          label = "Période"
+          type = 4
+          isRequired = true
+          value = { durationMs = 2592000000 }
+          typeSettings = { selectableValues = [{ durationMs = 86400000 }, { durationMs = 604800000 }, { durationMs = 2592000000 }] }
+        }]
+      }
+    },
+    {
+      type = 3
+      name = "par-modele-application"
+      content = {
+        version = "KqlItem/1.0"
+        title = "Usage et coût par modèle et par application"
+        query = "UsageCost | summarize appels = count(), erreurs = countif(status != 'success'), tokens_entree = sumif(input_tokens, input_tokens >= 0), tokens_sortie = sumif(output_tokens, output_tokens >= 0), cout_estime_eur = round(sum(estimated_cost_eur), 2) by model_alias, application_id, company_id | order by cout_estime_eur desc"
+        size = 0
+        timeContextFromParameter = "Periode"
+        queryType = 0
+        resourceType = "microsoft.operationalinsights/workspaces"
+        crossComponentResources = [workspace_id]
+        visualization = "table"
+      }
+    },
+    {
+      type = 3
+      name = "tokens-streaming"
+      content = {
+        version = "KqlItem/1.0"
+        title = "Tokens mesurés par la passerelle (y compris streaming)"
+        query = "TokenUsage | where metric != 'Total Tokens' | summarize tokens = sum(tokens) by bin(TimeGenerated, 1d), metric, model_alias"
+        size = 0
+        timeContextFromParameter = "Periode"
+        queryType = 0
+        resourceType = "microsoft.operationalinsights/workspaces"
+        crossComponentResources = [workspace_id]
+        visualization = "barchart"
+      }
+    },
+    {
+      type = 3
+      name = "par-utilisateur"
+      content = {
+        version = "KqlItem/1.0"
+        title = "Usage par utilisateur (pseudonymisé)"
+        query = "UsageCost | summarize appels = count(), cout_estime_eur = round(sum(estimated_cost_eur), 2) by user_id, application_id | top 50 by appels"
+        size = 0
+        timeContextFromParameter = "Periode"
+        queryType = 0
+        resourceType = "microsoft.operationalinsights/workspaces"
+        crossComponentResources = [workspace_id]
+        visualization = "table"
+      }
+    },
+    {
+      type = 3
+      name = "qualite"
+      content = {
+        version = "KqlItem/1.0"
+        title = "Erreurs, 429 et latence P95 par alias"
+        query = "UsageEvents | summarize appels = count(), erreurs_5xx = countif(http_status >= 500), limites_429 = countif(http_status == 429), latence_p95_ms = percentile(latency_ms, 95) by bin(timestamp, 1h), model_alias"
+        size = 0
+        timeContextFromParameter = "Periode"
+        queryType = 0
+        resourceType = "microsoft.operationalinsights/workspaces"
+        crossComponentResources = [workspace_id]
+        visualization = "linechart"
+      }
+    }
+  ]
+})}
