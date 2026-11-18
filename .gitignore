@@ -20,3 +20,6 @@ terraform.rc
 __pycache__/
 .venv/
 .pytest_cache/
+# Plans produits par scripts/ci/terraform-etats.sh
+tfplan
+tfplan.txt
