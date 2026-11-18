@@ -15,7 +15,7 @@
 	</inbound>
 	<backend>
 		<choose>
-			<when condition='@(context.Variables.GetValueOrDefault&lt;string>("rejection", "") == "")'>
+			<when condition="@(context.Variables.GetValueOrDefault&lt;string>(&quot;rejection&quot;, &quot;&quot;) == &quot;&quot;)">
 				<forward-request timeout="${backend_timeout_seconds}" buffer-response="false" />
 			</when>
 		</choose>
@@ -24,7 +24,7 @@
 		<base />
 		<include-fragment fragment-id="reponse" />
 		<choose>
-			<when condition='@(context.Variables.GetValueOrDefault&lt;int>("http-status", 0) >= 400)'>
+			<when condition="@(context.Variables.GetValueOrDefault&lt;int>(&quot;http-status&quot;, 0) >= 400)">
 				<include-fragment fragment-id="reponse-erreur" />
 			</when>
 		</choose>
