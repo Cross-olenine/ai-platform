@@ -64,6 +64,8 @@ jobs:
           done
 
       - name: tflint
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # téléchargement authentifié du plugin (limite de l'API GitHub)
         run: |
           ./tflint --init --config "$PWD/.tflint.hcl"
           rc=0
