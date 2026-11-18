@@ -7,7 +7,7 @@ Les hypothèses sont dans `docs/suivi/hypotheses.md`, les points à vérifier da
 1. **Premier cas d'usage** : remplir la fiche de qualification (`docs/gouvernance.md`) pour OpenCode, nommer le propriétaire métier et le budget (déclencheur de `docs/architecture/v1-socle-minimal.md`).
 2. ~~Compatibilité avec ADR-16~~ : **réglé**. ADR-16 range explicitement l'assistant de développement (Software Factory) dans la colonne « Plateforme ».
 3. ~~Premier adaptateur (CHN-02)~~ : **réglé**. OpenCode est l'adaptateur de la V1. Le bloc agents managés est construit plus tard dans la V1, quand un cas C1 ou C2 arrive.
-4. ~~Deux alias de modèles~~ : **réglé le 18/11/2026**. `agent-general` = gpt-6-luna, `agent-fast` = gpt-5-mini (PO-04 vérifié). Le coût de `agent-fast` est à réexaminer (PO-18).
+4. ~~Deux alias de modèles~~ : **réglé le 18/11/2026**. `agent-general` = gpt-6-luna, `agent-fast` = gpt-4.1-nano (PO-04 vérifié). gpt-4.1-nano arrive en fin de support le 14/04/2027 : successeur à choisir avant.
 5. **Éléments RGPD du premier cas** (CMP-03) : finalité, base légale, durées de conservation. Ce sont des informations que seul le propriétaire peut fournir.
 6. **Formulation d'IAM-01** : valider la reformulation imposée par ADR-18 (une clé d'abonnement identifie l'application mais n'authentifie pas).
 8. **Environnement d'apprentissage** : supprimer `rg-foundry-learning-dev` avant le bootstrap. Les règles Azure de la plateforme portent sur tout l'abonnement, et ses déploiements GlobalStandard y seraient non conformes.

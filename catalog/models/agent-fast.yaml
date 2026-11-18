@@ -1,28 +1,28 @@
-# Alias rapide (MGW-01). Choisi le 18/11/2026 (décision n°4 de docs/suivi/a-faire-v1.md, PO-04 vérifié).
-# Attention : plus cher que agent-general aux prix publics du 18/11/2026 (à réexaminer, PO-18).
+# Alias rapide et économique (MGW-01). gpt-4.1-nano choisi le 18/11/2026 (remplace gpt-5-mini, PO-18).
+# Modèle au statut « Legacy » chez Microsoft : fin de support le 14/04/2027, remplacement à préparer avant.
 alias: agent-fast
 owner: ai-platform-team
 status: active
 provider: azure
-model: gpt-5-mini
-model_version: "2025-08-07"
+model: gpt-4.1-nano
+model_version: "2025-04-14"
 model_format: OpenAI
-deployment_name: agent-fast-gpt-5-mini
+deployment_name: agent-fast-gpt-4-1-nano
 deployment_type: DataZoneStandard
 region: francecentral
 protocol: responses
-context_window: 272000           # contexte d'entrée publié pour gpt-5-mini : à confirmer (PO-18)
+context_window: 1047576          # fenêtre de contexte publiée pour gpt-4.1-nano
 max_output_tokens: 4096
 max_request_kb: 1024
 capabilities: [streaming, tools]
-pricing:                         # EUR par million de tokens, Data Zone (prix publics Azure, 18/11/2026)
-  input: 0.2469
-  cached_input: 0.0247
-  output: 1.975
+pricing:                         # EUR par million de tokens, Data Zone (prix publics Azure du 18/11/2026,
+  input: 0.1                     # publiés arrondis par millier de tokens : à affiner, PO-18)
+  cached_input: 0.025
+  output: 0.4
 limits:
-  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 300
-    dev: 30
-    prod: 150
+  capacity_thousand_tpm:         # quota Data Zone France Central de l'abonnement : 2000
+    dev: 100
+    prod: 500
 offers: [model-gateway]
-end_of_support: "2027-07-13"
-review_date: "2027-03-01"
+end_of_support: "2027-04-14"
+review_date: "2027-01-15"        # choisir le successeur avant la fin de support
