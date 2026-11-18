@@ -4,9 +4,9 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| IAM-01 | Tout appel est authentifié par un jeton Microsoft Entra ID. Aucune clé ne permet à elle seule d'appeler la plateforme. En V1 (ADR-18), une clé d'abonnement API Management identifie l'application pour les limites d'appels ; elle n'authentifie pas et ne suffit jamais sans jeton. | V1 | C | À faire |
-| IAM-02 | La passerelle accède à Foundry par identité managée. L'authentification par clé est désactivée sur les ressources Foundry. | V1 | C | À faire |
-| IAM-03 | Les rôles applicatifs (utilisateur, administrateur d'offre, exploitation) sont contrôlés à la passerelle. | V1 | C | À faire |
+| IAM-01 | Tout appel est authentifié par un jeton Microsoft Entra ID. Aucune clé ne permet à elle seule d'appeler la plateforme. En V1 (ADR-18), une clé d'abonnement API Management identifie l'application pour les limites d'appels ; elle n'authentifie pas et ne suffit jamais sans jeton. | V1 | C | En cours |
+| IAM-02 | La passerelle accède à Foundry par identité managée. L'authentification par clé est désactivée sur les ressources Foundry. | V1 | C | En cours |
+| IAM-03 | Les rôles applicatifs (utilisateur, administrateur d'offre, exploitation) sont contrôlés à la passerelle. | V1 | C | En cours |
 | IAM-04 | Le contexte (société, utilisateur, application, offre) est résolu à partir du jeton, jamais d'un en-tête déclaré par le client. | V2 | C | À faire |
 | IAM-05 | Plusieurs tenants Entra sont pris en charge, selon le mode retenu par ADR-04. | V2 | C | À faire |
 | IAM-06 | La révocation d'un utilisateur, d'une application ou d'une société prend effet dans un délai défini et testé. | V2 | C | À faire |

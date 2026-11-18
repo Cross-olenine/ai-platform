@@ -55,4 +55,18 @@ Trois mots d'ordre guident tout arbitrage : **automatisation et réutilisation**
 
 ## Commandes
 
-À compléter quand le code existe : formatage et validation Terraform, tests des policies, lancement des évaluations.
+```bash
+terraform fmt -recursive terraform                                    # formatage
+for d in terraform/environments/*/*; do terraform -chdir=$d init -backend=false && terraform -chdir=$d validate; done
+for d in terraform/modules/catalog terraform/stacks/*; do terraform -chdir=$d init -backend=false && terraform -chdir=$d test; done   # tests hors ligne (providers simulés)
+check-jsonschema --schemafile catalog/schemas/model.schema.json catalog/models/*.yaml               # schémas des catalogues
+python3 scripts/opencode/generer-config.py                            # configuration OpenCode depuis le catalogue
+scripts/ci/verifier-racines.sh                                        # racines dev et prod identiques
+AIPLAT_ENV=dev pytest -v api/tests                                    # tests de la passerelle déployée (az login requis)
+```
+
+Le déploiement passe uniquement par les pipelines (`docs/operations/deploiement.md`). Bootstrap : `docs/operations/bootstrap.md`.
+
+- Les évaluations (30 à 50 cas par agent) arrivent avec la phase agents.
+- Après une modification du catalogue des modèles, régénérer la configuration OpenCode.
+- Après une modification d'une policy, relancer `terraform test` (contrôle des 16 Kio).

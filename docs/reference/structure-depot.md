@@ -22,17 +22,19 @@ ai-platform/
 │   ├── environments/
 │   │   ├── dev/                  [V1]
 │   │   ├── test/                 [V2]
-│   │   └── prod/                 [V1]
+│   │   └── prod/                 [V1]  (une racine par état : socle, observabilite, passerelle-modeles)
+│   ├── stacks/                   [V1]  (composition d'un état, partagée par tous les environnements)
+│   ├── tests/fixtures/           [V1]  (catalogue fictif des tests « terraform test »)
 │   └── modules/
 │       ├── foundry-core/         [V1]
 │       ├── model-deployment/     [V1]
 │       ├── apim-core/            [V1]
 │       ├── model-gateway/        [V1]
 │       ├── agent-platform/       [V1]
-│       ├── identity/             [V1]
 │       ├── key-vault/            [V1]
 │       ├── observability/        [V1]
 │       ├── alerting/             [V1]
+│       ├── catalog/              [V1]  (lecture et contrôle des catalogues)
 │       ├── finops/               [V2]
 │       ├── networking/           [V2]
 │       ├── customer-onboarding/  [V2]
@@ -48,6 +50,7 @@ ai-platform/
 │   │   └── software-factory/     [V2]
 │   └── tests/                    [V1]
 ├── catalog/
+│   ├── schemas/                  [V1]  (JSON Schema, CAT-01)
 │   ├── models/                   [V1]
 │   ├── agents/                   [V1]
 │   ├── environments/             [V1]
@@ -61,9 +64,13 @@ ai-platform/
 │   ├── evaluators/               [V2]
 │   ├── baselines/                [V2]
 │   └── reports/                  [V2]
-├── adapters/                     [V1 : un seul]
+├── adapters/                     [V1 : un seul, opencode/]
 ├── templates/                    [V2]
-├── scripts/                      [V1]
+├── scripts/                      [V1]  (ci/, opencode/)
 ├── .github/workflows/            [V1]  (pipelines GitHub Actions, ADR-13)
 └── tests/                        [V1]
 ```
+
+**Écarts assumés en V1.**
+- Pas de module `identity` : l'identité managée de la passerelle est portée par `apim-core`, et les identités de pipeline par le bootstrap.
+- `pipelines/` est remplacé par `.github/workflows/` (ADR-13).

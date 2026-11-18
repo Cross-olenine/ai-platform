@@ -4,7 +4,7 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| DEX-01 | Un guide de démarrage et un exemple d'appel fonctionnel existent. | V1 | C | À faire |
+| DEX-01 | Un guide de démarrage et un exemple d'appel fonctionnel existent. | V1 | C | En cours |
 | DEX-02 | Toute demande passe par le processus de qualification (`docs/gouvernance.md`). | V1 | C | À faire |
 | DEX-03 | Un modèle d'agent et un modèle d'adaptateur sont fournis. | V2 | D | À faire |
 | DEX-04 | Un bac à sable à budget plafonné accueille les expérimentations (N1). | V2 | C | À faire |

@@ -4,14 +4,14 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| MGW-01 | Les consommateurs n'appellent que des alias fonctionnels stables. La correspondance alias → déploiement vit dans le catalogue des modèles. | V1 | C | À faire |
-| MGW-02 | Tout modèle absent du catalogue est refusé (liste blanche). | V1 | C | À faire |
-| MGW-03 | Une limite d'appels par minute et un quota d'appels par période sont appliqués à la passerelle, par abonnement (une application). Les limites de tokens sont reportées à MGW-20 (niveau Consumption : pas de limite de tokens, ADR-18). | V1 | N | À faire |
+| MGW-01 | Les consommateurs n'appellent que des alias fonctionnels stables. La correspondance alias → déploiement vit dans le catalogue des modèles. | V1 | C | En cours |
+| MGW-02 | Tout modèle absent du catalogue est refusé (liste blanche). | V1 | C | En cours |
+| MGW-03 | Une limite d'appels par minute et un quota d'appels par période sont appliqués à la passerelle, par abonnement (une application). Les limites de tokens sont reportées à MGW-20 (niveau Consumption : pas de limite de tokens, ADR-18). | V1 | N | En cours |
 | MGW-04 | La limite et le quota s'appliquent aussi par société et par utilisateur. | V2 | N | À faire |
-| MGW-05 | Chaque alias a un plafond de tokens de sortie et une taille maximale de requête. | V1 | C | À faire |
-| MGW-06 | Le streaming fonctionne de bout en bout, sans mise en tampon à la passerelle. | V1 | C | À faire |
-| MGW-07 | Les endpoints directs, clés, noms techniques et versions internes ne sont jamais visibles des consommateurs. | V1 | C | À faire |
-| MGW-08 | Le protocole exposé est fixé par ADR-06. | V1 | C | À faire |
+| MGW-05 | Chaque alias a un plafond de tokens de sortie et une taille maximale de requête. | V1 | C | En cours |
+| MGW-06 | Le streaming fonctionne de bout en bout, sans mise en tampon à la passerelle. | V1 | C | En cours |
+| MGW-07 | Les endpoints directs, clés, noms techniques et versions internes ne sont jamais visibles des consommateurs. | V1 | C | En cours |
+| MGW-08 | Le protocole exposé est fixé par ADR-06. | V1 | C | En cours |
 | MGW-09 | Le trafic est réparti sur plusieurs backends avec disjoncteur ; la bascule est automatique sur erreur 429 ou 5xx. | V2 | N | À faire |
 | MGW-10 | Chaque alias déclare un modèle de repli (dégradation contrôlée). | V2 | C | À faire |
 | MGW-11 | Un changement de modèle derrière un alias est traité comme un changement à risque : alias temporaire ou feature flag, campagne d'évaluation, bascule progressive. | V2 | C | À faire |

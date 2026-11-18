@@ -4,11 +4,11 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| API-01 | Les policies sont composées de fragments réutilisables. Aucune policy complète n'est copiée d'une API à l'autre. | V1 | C | À faire |
-| API-02 | Fragments V1 : authentification, contexte, corrélation, liste blanche, routage par alias, bornes des paramètres, limite d'appels par abonnement, événement d'usage, erreurs normalisées. Les fragments de limite et de métriques de tokens arrivent avec MGW-20 (V2, ADR-18). | V1 | C | À faire |
-| API-03 | Aucune valeur en dur dans une policy (P5). | V1 | C | À faire |
-| API-04 | La configuration a une seule source de vérité (ADR-05). | V1 | C | À faire |
-| API-05 | Tests automatisés de base : authentification, liste blanche, propagation des identifiants. | V1 | C | À faire |
+| API-01 | Les policies sont composées de fragments réutilisables. Aucune policy complète n'est copiée d'une API à l'autre. | V1 | C | En cours |
+| API-02 | Fragments V1 : authentification, contexte, corrélation, liste blanche, routage par alias, bornes des paramètres, limite d'appels par abonnement, événement d'usage, erreurs normalisées. La limite de tokens arrive avec MGW-20 (V2, ADR-18). Le fragment de métriques de tokens sert au comptage en streaming si PO-12 le confirme. | V1 | C | En cours |
+| API-03 | Aucune valeur en dur dans une policy (P5). | V1 | C | En cours |
+| API-04 | La configuration a une seule source de vérité (ADR-05). | V1 | C | En cours |
+| API-05 | Tests automatisés de base : authentification, liste blanche, propagation des identifiants. | V1 | C | En cours |
 | API-06 | Fragments V2 : autorisation par offre et rôle, contexte société, quotas, validation du corps et des paramètres, suppression des données sensibles, collecte FinOps. | V2 | C | À faire |
 | API-07 | Tout changement non rétrocompatible passe par une révision ou une version d'API. | V2 | N | À faire |
 | API-08 | Tests complets : quotas, paramètres interdits, format des erreurs, collecte FinOps. | V2 | C | À faire |

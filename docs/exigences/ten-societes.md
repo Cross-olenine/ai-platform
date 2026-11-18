@@ -4,7 +4,7 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| TEN-01 | Le champ société est présent dans tous les événements d'usage, même avec une seule société. | V1 | C | À faire |
+| TEN-01 | Le champ société est présent dans tous les événements d'usage, même avec une seule société. | V1 | C | En cours |
 | TEN-02 | Le référentiel des sociétés contient : identifiant interne, tenant Entra, entité contractuelle, centre de coût, offres souscrites, modèles et agents autorisés, quotas, budget, responsables à notifier, politique de dépassement, niveau d'isolation, période contractuelle. | V2 | C | À faire |
 | TEN-03 | L'onboarding se fait par modification déclarative du catalogue, sans déploiement manuel de composants partagés. | V2 | C | À faire |
 | TEN-04 | Le niveau d'isolation « mutualisé » sépare logiquement les données de sessions par société. Un test automatisé prouve l'absence d'accès croisé. | V2 | C | À faire |

@@ -4,12 +4,12 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| FIN-01 | Chaque requête produit un événement d'usage au format unique (`docs/reference/evenement-usage.md`), identique quel que soit le canal. | V1 | C | À faire |
-| FIN-02 | Le coût estimé est calculé à partir des tarifs du catalogue des modèles. | V1 | C | À faire |
-| FIN-03 | Des budgets Azure avec alertes existent par environnement. | V1 | N | À faire |
-| FIN-04 | Tout blocage repose sur un compteur temps réel à la passerelle, jamais sur les budgets Azure (ils sont évalués une fois par jour et ne font que notifier). | V1 | N | À faire |
-| FIN-05 | Toutes les ressources portent les tags obligatoires (`docs/reference/tags.md`), contrôlés automatiquement. | V1 | C | À faire |
-| FIN-06 | Un tableau de bord montre usage et coût par modèle, agent et application. | V1 | C | À faire |
+| FIN-01 | Chaque requête produit un événement d'usage au format unique (`docs/reference/evenement-usage.md`), identique quel que soit le canal. | V1 | C | En cours |
+| FIN-02 | Le coût estimé est calculé à partir des tarifs du catalogue des modèles. | V1 | C | En cours |
+| FIN-03 | Des budgets Azure avec alertes existent par environnement. | V1 | N | En cours |
+| FIN-04 | Tout blocage repose sur un compteur temps réel à la passerelle, jamais sur les budgets Azure (ils sont évalués une fois par jour et ne font que notifier). | V1 | N | En cours |
+| FIN-05 | Toutes les ressources portent les tags obligatoires (`docs/reference/tags.md`), contrôlés automatiquement. | V1 | C | En cours |
+| FIN-06 | Un tableau de bord montre usage et coût par modèle, agent et application. | V1 | C | En cours |
 | FIN-07 | Le coût fixe du socle est chiffré avant chaque version, puis suivi chaque mois. | V1 | C | À faire |
 | FIN-08 | La consommation est restituée par société, offre et projet. La règle de répartition des coûts partagés est documentée (ADR-11). | V2 | C | À faire |
 | FIN-09 | Le coût estimé est rapproché chaque mois du coût Azure réel ; l'écart toléré est défini. | V2 | C | À faire |

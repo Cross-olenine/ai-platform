@@ -4,9 +4,9 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 
 | ID | Exigence | Version | Mode | Statut |
 |---|---|---|---|---|
-| GRD-01 | Le filtrage de contenu en entrée et en sortie est actif sur tous les déploiements. | V1 | N | À faire |
-| GRD-02 | Les tentatives d'injection directe sont détectées. | V1 | N | À faire |
-| GRD-03 | La passerelle borne ou interdit les paramètres sensibles. | V1 | C | À faire |
+| GRD-01 | Le filtrage de contenu en entrée et en sortie est actif sur tous les déploiements. | V1 | N | En cours |
+| GRD-02 | Les tentatives d'injection directe sont détectées. | V1 | N | En cours |
+| GRD-03 | La passerelle borne ou interdit les paramètres sensibles. | V1 | C | En cours |
 | GRD-04 | Chaque jeu d'évaluation contient des cas adverses : injection, demande dépassant les droits, tentative de fuite. | V2 | C | À faire |
 | GRD-05 | Les données personnelles sont masquées dans les journaux. | V2 | C | À faire |
 | GRD-06 | Le contenu des documents et les résultats d'outils sont traités comme des données, jamais comme des instructions (protection contre l'injection indirecte). | V3 | C | À faire |
