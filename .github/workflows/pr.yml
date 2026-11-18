@@ -64,9 +64,13 @@ jobs:
           done
 
       - name: tflint
+        env:
+          GITHUB_TOKEN: ${{ github.token }} # téléchargement authentifié du plugin (limite de l'API GitHub)
         run: |
           ./tflint --init --config "$PWD/.tflint.hcl"
-          for d in terraform/bootstrap terraform/stacks/* terraform/modules/*; do ./tflint --chdir="$d" --config "$PWD/.tflint.hcl"; done
+          rc=0
+          for d in terraform/bootstrap terraform/stacks/* terraform/modules/*; do ./tflint --chdir="$d" --config "$PWD/.tflint.hcl" || rc=1; done
+          exit $rc
 
       - name: Tests Terraform hors ligne (catalogue, policies, limite 16 Kio)
         run: |

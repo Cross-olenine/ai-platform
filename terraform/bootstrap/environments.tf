@@ -23,14 +23,24 @@ resource "azuread_service_principal" "pipeline" {
   owners    = [data.azurerm_client_config.current.object_id]
 }
 
+# GitHub émet un sujet immuable pour les nouveaux dépôts : repo:<compte>@<id>/<dépôt>@<id>:<suite>.
+# Il résiste au renommage ou à la recréation du compte et du dépôt.
+data "github_user" "owner" {
+  username = local.commun.github.owner
+}
+
+locals {
+  oidc_subject_prefix = "repo:${local.commun.github.owner}@${data.github_user.owner.id}/${github_repository.platform.name}@${github_repository.platform.repo_id}"
+}
+
 resource "azuread_application_federated_identity_credential" "pipeline" {
   for_each       = local.oidc_credentials
   application_id = azuread_application.pipeline[each.value.env].id
-  display_name   = replace(replace(each.value.subject, "/[^A-Za-z0-9-]/", "-"), "/-+/", "-")
-  description    = "GitHub OIDC : ${each.value.subject}"
+  display_name   = "github-${replace(replace(each.value.claim, "/[^A-Za-z0-9-]/", "-"), "/-+/", "-")}"
+  description    = "GitHub OIDC : ${local.oidc_subject_prefix}:${each.value.claim}"
   audiences      = ["api://AzureADTokenExchange"]
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = each.value.subject
+  subject        = "${local.oidc_subject_prefix}:${each.value.claim}"
 }
 
 # Droits de l'identité de pipeline, limités à son groupe de ressources.

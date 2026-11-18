@@ -30,12 +30,20 @@ resource "azurerm_storage_account" "tfstate" {
       days = 30
     }
   }
+
+  lifecycle {
+    prevent_destroy = true # perte des états = perte de la maîtrise de l'infrastructure
+  }
 }
 
 resource "azurerm_storage_container" "bootstrap" {
   name                  = "bootstrap"
   storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true # perte des états = perte de la maîtrise de l'infrastructure
+  }
 }
 
 resource "azurerm_storage_container" "env" {
@@ -43,6 +51,10 @@ resource "azurerm_storage_container" "env" {
   name                  = each.key
   storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true # perte des états = perte de la maîtrise de l'infrastructure
+  }
 }
 
 # L'administrateur qui lance le bootstrap doit pouvoir lire et écrire l'état (accès Entra).
