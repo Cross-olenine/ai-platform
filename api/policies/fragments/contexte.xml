@@ -1,0 +1,12 @@
+<!-- FIN-01, TEN-01 : contexte de l'appel. L'utilisateur est pseudonymisé (hachage salé de l'oid Entra).
+     application-id, channel et allowed-models sont posés par la policy du produit (une application = un produit). -->
+<fragment>
+	<set-variable name="user-id" value='@{
+		var jwt = (Jwt)context.Variables["jwt"];
+		var oid = jwt.Claims.GetValueOrDefault("oid", jwt.Subject ?? "");
+		var hash = System.Security.Cryptography.SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes("{{user-hash-salt}}" + oid));
+		return BitConverter.ToString(hash).Replace("-", "").Substring(0, 32).ToLowerInvariant();
+	}' />
+	<set-variable name="company-id" value="{{default-company-id}}" />
+	<set-variable name="session-id" value='@(context.Request.Headers.GetValueOrDefault("x-session-id", ""))' />
+</fragment>

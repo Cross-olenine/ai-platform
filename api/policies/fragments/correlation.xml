@@ -1,0 +1,12 @@
+<!-- OBS-01 : contexte de trace W3C propagé de l'interface au modèle ; créé s'il est absent ou invalide. -->
+<fragment>
+	<set-variable name="traceparent" value='@{
+		var tp = context.Request.Headers.GetValueOrDefault("traceparent", "");
+		if (System.Text.RegularExpressions.Regex.IsMatch(tp, "^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$")) { return tp; }
+		return "00-" + Guid.NewGuid().ToString("N") + "-" + Guid.NewGuid().ToString("N").Substring(0, 16) + "-01";
+	}' />
+	<set-variable name="trace-id" value='@(((string)context.Variables["traceparent"]).Split(&apos;-&apos;)[1])' />
+	<set-header name="traceparent" exists-action="override">
+		<value>@((string)context.Variables["traceparent"])</value>
+	</set-header>
+</fragment>

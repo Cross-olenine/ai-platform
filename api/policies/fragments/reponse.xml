@@ -1,0 +1,32 @@
+<!-- MGW-07, OBS-01, AGT-05 : aucune information technique vers le consommateur.
+     Pose http-status et error-code si la requête a été refusée par la passerelle (rejection) ou par le backend. -->
+<fragment>
+	<set-header name="x-ms-region" exists-action="delete" />
+	<set-header name="x-ms-deployment-name" exists-action="delete" />
+	<set-header name="azureml-model-session" exists-action="delete" />
+	<set-header name="x-ms-client-request-id" exists-action="delete" />
+	<set-header name="apim-request-id" exists-action="delete" />
+	<choose>
+		<when condition='@(context.Variables.GetValueOrDefault&lt;string>("rejection", "") != "")'>
+			<set-variable name="http-status" value='@(int.Parse(((string)context.Variables["rejection"]).Split(&apos;|&apos;)[0]))' />
+			<set-variable name="error-code" value='@(((string)context.Variables["rejection"]).Split(&apos;|&apos;)[1])' />
+		</when>
+		<when condition="@(context.Response.StatusCode >= 400)">
+			<set-variable name="http-status" value="@(context.Response.StatusCode)" />
+			<set-variable name="error-code" value='@{
+				var c = context.Response.Body?.As&lt;JObject>(preserveContent: true)?["error"]?["code"]?.ToString();
+				return string.IsNullOrEmpty(c) ? "upstream_error" : c;
+			}' />
+		</when>
+		<when condition='@(!context.Variables.GetValueOrDefault&lt;bool>("streaming", false))'>
+			<!-- Réponse complète : l'alias remplace le nom du modèle réel. En streaming, impossible sans mise en tampon (PO-15). -->
+			<set-variable name="response-body" value="@(context.Response.Body?.As&lt;JObject>(preserveContent: true))" />
+			<set-body>@{
+				var b = (JObject)context.Variables["response-body"];
+				if (b == null) { return ""; }
+				b["model"] = (string)context.Variables["model-alias"];
+				return b.ToString(Newtonsoft.Json.Formatting.None);
+			}</set-body>
+		</when>
+	</choose>
+</fragment>

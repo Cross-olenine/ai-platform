@@ -1,0 +1,17 @@
+<!-- AGT-05 : corps d'erreur unique { error: { code, trace_id } } à partir des variables http-status et error-code. -->
+<fragment>
+	<set-status code='@(context.Variables.GetValueOrDefault&lt;int>("http-status", 500))' reason='@(context.Variables.GetValueOrDefault&lt;string>("error-code", "error"))' />
+	<set-header name="Content-Type" exists-action="override">
+		<value>application/json</value>
+	</set-header>
+	<choose>
+		<when condition='@(context.Variables.GetValueOrDefault&lt;int>("http-status", 500) == 429)'>
+			<set-header name="Retry-After" exists-action="override">
+				<value>@(context.Variables.GetValueOrDefault&lt;string>("retry-after", "60"))</value>
+			</set-header>
+		</when>
+	</choose>
+	<set-body>@(new JObject(new JProperty("error", new JObject(
+		new JProperty("code", context.Variables.GetValueOrDefault&lt;string>("error-code", "error")),
+		new JProperty("trace_id", context.Variables.GetValueOrDefault&lt;string>("trace-id", ""))))).ToString(Newtonsoft.Json.Formatting.None))</set-body>
+</fragment>

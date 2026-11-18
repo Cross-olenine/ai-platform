@@ -1,0 +1,10 @@
+<!-- PO-12 : comptage des tokens par la passerelle, y compris en streaming (métriques Application Insights).
+     Dimensions à faible cardinalité, sauf user_id pseudonymisé (à surveiller, OBS-04). -->
+<fragment>
+	<llm-emit-token-metric namespace="{{metrics-namespace}}">
+		<dimension name="application_id" value='@((string)context.Variables["application-id"])' />
+		<dimension name="model_alias" value='@((string)context.Variables["model-alias"])' />
+		<dimension name="company_id" value='@((string)context.Variables["company-id"])' />
+		<dimension name="user_id" value='@((string)context.Variables["user-id"])' />
+	</llm-emit-token-metric>
+</fragment>

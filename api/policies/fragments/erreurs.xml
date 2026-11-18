@@ -1,0 +1,19 @@
+<!-- AGT-05, MGW-07 : statut et code d'erreur normalisés à partir de l'erreur levée (authentification, limites, backend). -->
+<fragment>
+	<set-variable name="http-status" value='@{
+		var source = context.LastError?.Source ?? "";
+		if (source == "validate-azure-ad-token") { return 401; }
+		if (source == "rate-limit" || source == "quota") { return 429; }
+		if (context.Response != null &amp;&amp; context.Response.StatusCode >= 400) { return context.Response.StatusCode; }
+		return 500;
+	}' />
+	<set-variable name="retry-after" value='@(context.Response?.Headers.GetValueOrDefault("Retry-After", "60") ?? "60")' />
+	<set-variable name="error-code" value='@{
+		var s = (int)context.Variables["http-status"];
+		if (s == 401) { return "unauthorized"; }
+		if (s == 403) { return "forbidden"; }
+		if (s == 429) { return "rate_limited"; }
+		if (s &lt; 500) { return "bad_request"; }
+		return "gateway_error";
+	}' />
+</fragment>

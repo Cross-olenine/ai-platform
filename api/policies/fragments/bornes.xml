@@ -1,0 +1,42 @@
+<!-- MGW-05, GRD-03 : taille de requête, paramètres interdits, types d'outils autorisés, plafond de sortie par alias.
+     Ne fait rien si un fragment précédent a déjà refusé la requête. -->
+<fragment>
+	<choose>
+		<when condition='@(((string)context.Variables["rejection"]) == "")'>
+			<set-variable name="rejection" value='@{
+				var body = (JObject)context.Variables["request-body"];
+				var route = ((string)context.Variables["route"]).Split(&apos;|&apos;);
+				var size = System.Text.Encoding.UTF8.GetByteCount(context.Request.Body.As&lt;string>(preserveContent: true));
+				if (size > long.Parse(route[3]) * 1024) { return "413|request_too_large"; }
+				foreach (var p in "{{forbidden-parameters}}".Split(&apos;,&apos;)) {
+					if (p != "" &amp;&amp; body[p] != null) { return "400|parameter_not_allowed"; }
+				}
+				var allowedTools = "{{allowed-tool-types}}".Split(&apos;,&apos;);
+				var tools = body["tools"] as JArray;
+				if (tools != null) {
+					foreach (var t in tools) {
+						if (!allowedTools.Contains(t["type"]?.ToString() ?? "")) { return "400|tool_not_allowed"; }
+					}
+				}
+				return "";
+			}' />
+		</when>
+	</choose>
+	<choose>
+		<when condition='@(((string)context.Variables["rejection"]) == "")'>
+			<set-variable name="streaming" value='@{
+				var s = ((JObject)context.Variables["request-body"])["stream"];
+				return s != null &amp;&amp; s.Type == JTokenType.Boolean &amp;&amp; (bool)s;
+			}' />
+			<set-body>@{
+				var body = (JObject)context.Variables["request-body"];
+				var route = ((string)context.Variables["route"]).Split('|');
+				var cap = int.Parse(route[2]);
+				body["model"] = route[1];
+				var requested = body["max_output_tokens"];
+				if (requested == null || requested.Type != JTokenType.Integer || (int)requested > cap) { body["max_output_tokens"] = cap; }
+				return body.ToString(Newtonsoft.Json.Formatting.None);
+			}</set-body>
+		</when>
+	</choose>
+</fragment>

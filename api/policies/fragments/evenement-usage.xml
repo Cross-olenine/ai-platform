@@ -1,0 +1,53 @@
+<!-- FIN-01, OBS-02, OBS-05 : un événement d'usage par requête (docs/reference/evenement-usage.md), sans contenu.
+     policy trace -> Application Insights (AppTraces), ADR-18. Tokens à -1 si inconnus (streaming : voir TokenUsage, PO-12).
+     Le coût estimé est calculé à la lecture à partir des tarifs du catalogue (FIN-02, fonction UsageCost). -->
+<fragment>
+	<set-header name="x-trace-id" exists-action="override">
+		<value>@(context.Variables.GetValueOrDefault&lt;string>("trace-id", ""))</value>
+	</set-header>
+	<trace source="usage-event" severity="information">
+		<message>@{
+			var v = context.Variables;
+			Func&lt;string, string> g = n => v.GetValueOrDefault&lt;string>(n, "");
+			var st = v.GetValueOrDefault&lt;bool>("streaming", false);
+			var hs = v.GetValueOrDefault&lt;int>("http-status", context.Response.StatusCode);
+			long i = -1, c = -1, o = -1, r = -1; int t = -1; bool tr = false;
+			var b = v.GetValueOrDefault&lt;JObject>("response-body", null);
+			if (!st &amp;&amp; hs &lt; 400 &amp;&amp; b != null) {
+				var u = b["usage"];
+				i = u?["input_tokens"]?.Value&lt;long>() ?? -1;
+				c = u?["input_tokens_details"]?["cached_tokens"]?.Value&lt;long>() ?? 0;
+				o = u?["output_tokens"]?.Value&lt;long>() ?? -1;
+				r = u?["output_tokens_details"]?["reasoning_tokens"]?.Value&lt;long>() ?? 0;
+				t = (b["output"] as JArray)?.Count(x => x["type"]?.ToString() == "function_call") ?? 0;
+				tr = b["status"]?.ToString() == "incomplete";
+			}
+			var ms = (long)context.Elapsed.TotalMilliseconds;
+			var e = new JObject();
+			e["trace_id"] = g("trace-id");
+			e["environment"] = "{{environment}}";
+			e["company_id"] = v.GetValueOrDefault&lt;string>("company-id", "{{default-company-id}}");
+			e["user_id"] = g("user-id");
+			e["application_id"] = g("application-id");
+			e["channel"] = g("channel");
+			e["offer_id"] = "{{offer-id}}";
+			e["session_id"] = g("session-id");
+			e["model_alias"] = g("model-alias");
+			e["deployment"] = g("deployment");
+			e["model_version"] = g("model-version");
+			e["input_tokens"] = i;
+			e["cached_input_tokens"] = c;
+			e["output_tokens"] = o;
+			e["reasoning_tokens"] = r;
+			e["tool_calls"] = t;
+			e["status"] = hs &lt; 400 ? "success" : "error";
+			e["http_status"] = hs;
+			e["latency_ms"] = st ? -1 : ms;
+			e["time_to_first_token_ms"] = st ? ms : -1;
+			e["truncated"] = tr;
+			e["streaming"] = st;
+			return e.ToString(Newtonsoft.Json.Formatting.None);
+		}</message>
+		<metadata name="event" value="usage-event" />
+	</trace>
+</fragment>

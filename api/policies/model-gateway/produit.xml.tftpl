@@ -1,0 +1,21 @@
+<!-- Policy du produit d'une application consommatrice (MGW-03, FIN-04, ADR-18).
+     Générée par Terraform pour chaque entrée « applications » du catalogue d'environnement. -->
+<policies>
+	<inbound>
+		<base />
+		<set-variable name="application-id" value="${application_id}" />
+		<set-variable name="channel" value="${channel}" />
+		<set-variable name="allowed-models" value="${allowed_models}" />
+		<rate-limit calls="${calls_per_minute}" renewal-period="60" />
+		<quota calls="${calls_per_period}" renewal-period="${period_seconds}" />
+	</inbound>
+	<backend>
+		<base />
+	</backend>
+	<outbound>
+		<base />
+	</outbound>
+	<on-error>
+		<base />
+	</on-error>
+</policies>

@@ -1,0 +1,18 @@
+<!-- IAM-01, IAM-03 : jeton Entra ID obligatoire, audience de l'API passerelle, rôle applicatif requis.
+     La clé d'abonnement (ADR-18) identifie l'application ; elle ne remplace jamais le jeton. -->
+<fragment>
+	<validate-azure-ad-token tenant-id="{{tenant-id}}" header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="unauthorized" output-token-variable-name="jwt">
+		<audiences>
+			<audience>{{gateway-audience}}</audience>
+			<audience>api://{{gateway-audience}}</audience>
+		</audiences>
+		<required-claims>
+			<claim name="roles" match="any">
+				<value>utilisateur</value>
+				<value>admin-offre</value>
+				<value>exploitation</value>
+			</claim>
+		</required-claims>
+	</validate-azure-ad-token>
+	<set-header name="Ocp-Apim-Subscription-Key" exists-action="delete" />
+</fragment>

@@ -1,0 +1,39 @@
+<!-- Policy de l'API Model Gateway (API-01) : uniquement des fragments, dans l'ordre d'exécution.
+     Modèle généré par Terraform (module model-gateway). Valeurs issues du catalogue (API-03). -->
+<policies>
+	<inbound>
+		<include-fragment fragment-id="authentification" />
+		<include-fragment fragment-id="correlation" />
+		<base />
+		<include-fragment fragment-id="contexte" />
+		<include-fragment fragment-id="liste-blanche-routage" />
+		<include-fragment fragment-id="bornes" />
+%{ if token_metrics_enabled ~}
+		<include-fragment fragment-id="metriques-tokens" />
+%{ endif ~}
+		<authentication-managed-identity resource="${backend_audience}" />
+	</inbound>
+	<backend>
+		<choose>
+			<when condition='@(context.Variables.GetValueOrDefault&lt;string>("rejection", "") == "")'>
+				<forward-request timeout="${backend_timeout_seconds}" buffer-response="false" />
+			</when>
+		</choose>
+	</backend>
+	<outbound>
+		<base />
+		<include-fragment fragment-id="reponse" />
+		<choose>
+			<when condition='@(context.Variables.GetValueOrDefault&lt;int>("http-status", 0) >= 400)'>
+				<include-fragment fragment-id="reponse-erreur" />
+			</when>
+		</choose>
+		<include-fragment fragment-id="evenement-usage" />
+	</outbound>
+	<on-error>
+		<base />
+		<include-fragment fragment-id="erreurs" />
+		<include-fragment fragment-id="reponse-erreur" />
+		<include-fragment fragment-id="evenement-usage" />
+	</on-error>
+</policies>

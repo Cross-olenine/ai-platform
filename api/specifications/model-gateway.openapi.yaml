@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: Model Gateway
+  version: "1.0"
+  description: |
+    Accès gouverné aux modèles de la plateforme IA (ADR-06 : API Responses).
+    Authentification : jeton Entra ID (en-tête Authorization) et clé d'abonnement de l'application
+    (en-tête Ocp-Apim-Subscription-Key, ADR-18). Le champ « model » contient un alias du catalogue (MGW-01).
+servers:
+  - url: https://gateway.example.invalid/model-gateway/v1
+paths:
+  /responses:
+    post:
+      operationId: createResponse
+      summary: Créer une réponse (API Responses)
+      parameters:
+        - name: traceparent
+          in: header
+          required: false
+          description: Contexte de trace W3C (OBS-01). Créé par la passerelle s'il est absent.
+          schema:
+            type: string
+        - name: x-session-id
+          in: header
+          required: false
+          description: Identifiant de session côté client, repris dans l'événement d'usage.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model, input]
+              properties:
+                model:
+                  type: string
+                  description: Alias de modèle du catalogue (par exemple agent-general).
+                input:
+                  description: Texte ou liste d'éléments d'entrée.
+                stream:
+                  type: boolean
+                max_output_tokens:
+                  type: integer
+                  description: Plafonné par la passerelle selon l'alias (MGW-05).
+              additionalProperties: true
+      responses:
+        "200":
+          description: Réponse du modèle, ou flux d'événements si stream est vrai.
+          headers:
+            x-trace-id:
+              schema:
+                type: string
+        "400":
+          description: "Requête refusée : model_not_allowed, parameter_not_allowed, tool_not_allowed, content_filter…"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Jeton absent, invalide ou sans rôle applicatif.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "413":
+          description: Requête trop volumineuse pour l'alias.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Limite d'appels de l'application atteinte (en-tête Retry-After).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            trace_id:
+              type: string

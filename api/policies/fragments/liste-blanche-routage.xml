@@ -1,0 +1,28 @@
+<!-- MGW-01, MGW-02, MGW-07 : l'alias demandé doit être actif au catalogue et autorisé pour l'application.
+     model-routes (named value générée depuis catalog/models) : alias|déploiement|max_output_tokens|max_request_kb|version;...
+     En cas de refus, pose la variable « rejection » (statut|code) ; la policy de l'API renvoie l'erreur. -->
+<fragment>
+	<set-variable name="request-body" value="@(context.Request.Body?.As&lt;JObject>(preserveContent: true))" />
+	<set-variable name="model-alias" value='@{
+		var body = (JObject)context.Variables["request-body"];
+		return body == null ? "" : (body["model"]?.ToString() ?? "");
+	}' />
+	<set-variable name="route" value='@{
+		var alias = (string)context.Variables["model-alias"];
+		var allowed = context.Variables.GetValueOrDefault&lt;string>("allowed-models", "").Split(&apos;,&apos;);
+		if (alias == "" || !allowed.Contains(alias)) { return ""; }
+		foreach (var r in "{{model-routes}}".Split(&apos;;&apos;)) {
+			var p = r.Split(&apos;|&apos;);
+			if (p.Length == 5 &amp;&amp; p[0] == alias) { return r; }
+		}
+		return "";
+	}' />
+	<set-variable name="rejection" value='@(string.IsNullOrEmpty((string)context.Variables["route"]) ? "400|model_not_allowed" : "")' />
+	<choose>
+		<when condition='@(((string)context.Variables["rejection"]) == "")'>
+			<set-variable name="deployment" value='@(((string)context.Variables["route"]).Split(&apos;|&apos;)[1])' />
+			<set-variable name="model-version" value='@(((string)context.Variables["route"]).Split(&apos;|&apos;)[4])' />
+			<set-backend-service backend-id="foundry-openai" />
+		</when>
+	</choose>
+</fragment>
