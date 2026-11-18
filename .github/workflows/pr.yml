@@ -88,8 +88,10 @@ jobs:
       - name: Racines dev et prod identiques
         run: scripts/ci/verifier-racines.sh
 
-      - name: Policies XML bien formées
-        run: for f in api/policies/fragments/*.xml; do python -c "import sys,xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" "$f"; done
+      - name: Policies XML bien formées, sans commentaire « // » (fragments mis sur une ligne au déploiement)
+        run: |
+          for f in api/policies/fragments/*.xml; do python -c "import sys,xml.dom.minidom; xml.dom.minidom.parse(sys.argv[1])" "$f"; done
+          if grep -nP '(?<![a-z]:)//' api/policies/fragments/*.xml; then echo "::error::commentaire // interdit dans un fragment"; exit 1; fi
 
       - name: Configuration OpenCode à jour (CHN-07)
         run: |

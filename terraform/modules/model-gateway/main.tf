@@ -67,8 +67,12 @@ locals {
     if var.token_metrics_enabled || f != "metriques-tokens.xml"
   }
 
-  # Les commentaires et l'indentation sont retirés : une policy assemblée est limitée à 16 Kio en Consumption (ADR-18).
-  minify = { for k, f in local.fragments : k => replace(replace(file("${var.policies_path}/fragments/${f}"), "/<!--[\\s\\S]*?-->/", ""), "/\\n[\\t ]+/", "\n") }
+  # Commentaires retirés et fragment mis sur une ligne :
+  # - une policy assemblée est limitée à 16 Kio en Consumption (ADR-18) ;
+  # - le XML remplace les retours à la ligne des attributs par des espaces : sans cette mise en ligne,
+  #   la valeur relue dans API Management diffère du code et chaque plan signale une fausse dérive.
+  #   Conséquence : pas de commentaire « // » dans les expressions C# des fragments.
+  minify = { for k, f in local.fragments : k => trimspace(replace(replace(file("${var.policies_path}/fragments/${f}"), "/<!--[\\s\\S]*?-->/", ""), "/\\s*\\n\\s*/", " ")) }
 
   # alias|déploiement|max_output_tokens|max_request_kb|version (fragment liste-blanche-routage).
   model_routes = length(var.models) == 0 ? "none" : join(";", [

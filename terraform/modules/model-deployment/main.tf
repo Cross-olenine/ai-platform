@@ -28,6 +28,11 @@ resource "azurerm_cognitive_deployment" "this" {
     name     = each.value.deployment_type
     capacity = each.value.limits.capacity_thousand_tpm
   }
+
+  # Changement de modèle derrière un alias : le nouveau déploiement existe avant la suppression de l'ancien.
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 output "deployments" {
