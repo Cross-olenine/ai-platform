@@ -4,7 +4,7 @@
   "title": "Paramètres communs de la plateforme",
   "type": "object",
   "additionalProperties": false,
-  "required": ["platform", "tags", "governance", "bootstrap", "gateway_api", "github"],
+  "required": ["platform", "tags", "governance", "bootstrap", "gateway_api", "content_filter", "gateway_policy", "github"],
   "properties": {
     "platform": {
       "type": "object", "additionalProperties": false,
@@ -31,6 +31,26 @@
     },
     "bootstrap": {"type": "object", "required": ["name_suffix"], "properties": {"name_suffix": {"type": "string", "pattern": "^[0-9]{2}$"}}},
     "gateway_api": {"type": "object", "required": ["preauthorized_client_ids"], "properties": {"preauthorized_client_ids": {"type": "array", "items": {"type": "string"}}}},
+    "content_filter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["base_policy", "severity_threshold", "harm_categories", "prompt_shields", "protected_material"],
+      "properties": {
+        "base_policy": {"type": "string"},
+        "severity_threshold": {"enum": ["Low", "Medium", "High"]},
+        "harm_categories": {"type": "array", "items": {"enum": ["Hate", "Sexual", "Violence", "SelfHarm"]}, "minItems": 4},
+        "prompt_shields": {"const": true},
+        "protected_material": {"type": "boolean"}
+      }
+    },
+    "gateway_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["allowed_tool_types", "forbidden_parameters", "backend_timeout_seconds"],
+      "properties": {
+        "backend_timeout_seconds": {"type": "integer", "minimum": 30, "maximum": 600},
+        "allowed_tool_types": {"type": "array", "items": {"type": "string"}},
+        "forbidden_parameters": {"type": "array", "items": {"type": "string"}}
+      }
+    },
     "github": {
       "type": "object", "additionalProperties": false,
       "required": ["owner", "repository", "visibility", "required_approvals", "prod_reviewers", "required_status_check", "branches"],

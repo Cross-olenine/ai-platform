@@ -40,6 +40,20 @@ gateway_api:
   # 04b07795-... = Azure CLI (utilisé par scripts/opencode-token, PO-14).
   preauthorized_client_ids: ["04b07795-8ddb-461a-bbee-02f9e1bf7b46"]
 
+# GRD-01, GRD-02 : politique de filtrage de contenu appliquée à tous les déploiements.
+content_filter:
+  base_policy: Microsoft.DefaultV2
+  severity_threshold: Medium      # Low | Medium | High
+  harm_categories: [Hate, Sexual, Violence, SelfHarm]
+  prompt_shields: true            # détection d'injection directe (Jailbreak)
+  protected_material: true
+
+# GRD-03 : paramètres bornés ou interdits par la passerelle.
+gateway_policy:
+  allowed_tool_types: [function, custom]   # outils hébergés (recherche web, code...) refusés en V1
+  forbidden_parameters: [background]       # traitement asynchrone : V3
+  backend_timeout_seconds: 300             # réponses longues d'un assistant de code
+
 github:
   owner: A_RENSEIGNER            # compte GitHub qui héberge le dépôt
   repository: ai-platform

@@ -4,7 +4,7 @@
   "title": "Catalogue d'environnement (CAT-02)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "subscription_id", "criticality", "name_suffix", "github", "budget", "observability", "alerting", "gateway", "access", "applications"],
+  "required": ["name", "subscription_id", "criticality", "name_suffix", "github", "key_vault", "budget", "observability", "alerting", "gateway", "access", "applications"],
   "$defs": {
     "guid": {"type": "string", "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$"},
     "guids": {"type": "array", "items": {"$ref": "#/$defs/guid"}, "uniqueItems": true}
@@ -17,6 +17,10 @@
     "github": {
       "type": "object", "additionalProperties": false, "required": ["deploy_branch", "plan_on_pull_request"],
       "properties": {"deploy_branch": {"type": "string"}, "plan_on_pull_request": {"type": "boolean"}}
+    },
+    "key_vault": {
+      "type": "object", "additionalProperties": false, "required": ["purge_protection"],
+      "properties": {"purge_protection": {"type": "boolean"}}
     },
     "budget": {
       "type": "object", "additionalProperties": false, "required": ["monthly_amount_eur", "thresholds_percent", "contact_emails"],

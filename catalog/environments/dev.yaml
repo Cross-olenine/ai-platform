@@ -7,6 +7,9 @@ github:
   deploy_branch: develop           # branche qui déploie cet environnement
   plan_on_pull_request: true       # l'identité de dev produit les plans des demandes de changement
 
+key_vault:
+  purge_protection: false            # false en dev : reconstruction complète possible (critère de sortie V1)
+
 budget:                            # FIN-03 : notification seulement, jamais de blocage (FIN-04)
   monthly_amount_eur: 50
   thresholds_percent: [50, 80, 100]

@@ -7,6 +7,9 @@ github:
   deploy_branch: main
   plan_on_pull_request: false      # ADR-13 : l'identité de production n'est utilisable que depuis main
 
+key_vault:
+  purge_protection: true            # protection contre la purge en production
+
 budget:
   monthly_amount_eur: 300          # A_AJUSTER avec le propriétaire du cas d'usage
   thresholds_percent: [50, 80, 100]

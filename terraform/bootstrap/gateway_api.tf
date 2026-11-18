@@ -85,6 +85,14 @@ resource "azuread_application_pre_authorized" "gateway_api" {
   permission_ids       = [random_uuid.scope_user_impersonation.result]
 }
 
+# Les identités de pipeline appellent la passerelle de leur environnement pour les tests après déploiement (API-05).
+resource "azuread_app_role_assignment" "pipeline_exploitation" {
+  for_each            = local.environments
+  app_role_id         = random_uuid.app_role["exploitation"].result
+  principal_object_id = azuread_service_principal.pipeline[each.key].object_id
+  resource_object_id  = azuread_service_principal.gateway_api[each.key].object_id
+}
+
 resource "azuread_app_role_assignment" "gateway_api" {
   for_each            = local.role_assignments
   app_role_id         = random_uuid.app_role[each.value.role].result

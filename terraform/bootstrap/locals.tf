@@ -32,13 +32,15 @@ locals {
   }
 
   # Sujets OIDC GitHub autorisés par environnement (ADR-13).
-  # dev  : déploiement depuis l'environnement GitHub « dev » et plans des demandes de changement.
+  # dev  : déploiement depuis l'environnement GitHub « dev », plans des demandes de changement,
+  #        et tests rejoués lors des promotions (branches test et preprod, sans ressource Azure en V1).
   # prod : plan et déploiement depuis les environnements GitHub « prod-plan » et « prod » (branche main uniquement).
   oidc_subjects = {
     for k, e in local.environments : k => concat(
       ["repo:${local.repo_full}:environment:${k}"],
       k == "prod" ? ["repo:${local.repo_full}:environment:prod-plan"] : [],
-      e.github.plan_on_pull_request ? ["repo:${local.repo_full}:pull_request"] : []
+      e.github.plan_on_pull_request ? ["repo:${local.repo_full}:pull_request"] : [],
+      e.github.plan_on_pull_request ? [for b in local.commun.github.branches.promotion : "repo:${local.repo_full}:ref:refs/heads/${b}"] : []
     )
   }
 
