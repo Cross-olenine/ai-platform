@@ -33,7 +33,7 @@ API Management au niveau **Consumption** en V1, une instance par environnement (
 
 ## Conséquences
 
-- **Limites par application (MGW-03).** Elles reposent sur `rate-limit` et `quota` par abonnement API Management, avec un abonnement par application consommatrice. La clé d'abonnement identifie l'application ; elle n'authentifie personne. Le jeton Entra ID reste obligatoire sur chaque appel, et une clé seule ne donne accès à rien (IAM-01 est reformulée en ce sens).
+- **Limites par application (MGW-03).** Elles reposent sur `rate-limit` et `quota` par abonnement API Management, avec un abonnement par application consommatrice. La clé d'abonnement identifie l'application ; elle n'authentifie personne. Le jeton Entra ID reste obligatoire sur chaque appel, et une clé seule ne donne accès à rien (IAM-01 est reformulée en ce sens, formulation validée le 19/11/2026).
 - **Pas de limite de tokens en V1** (MGW-20 reste en V2). Les plafonds de sortie par alias (MGW-05) bornent le coût d'une requête.
 - **Télémétrie.** Les événements d'usage sont écrits par la policy `trace` dans une ressource Application Insights adossée à l'espace Log Analytics de l'environnement. Ils arrivent donc bien dans une table de journaux Log Analytics, ce qui reste conforme à ADR-08.
 - **Taille des policies.** Une policy assemblée ne doit pas dépasser 16 Kio. Un contrôle automatique le vérifie à chaque demande de changement.
