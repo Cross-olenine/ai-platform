@@ -23,6 +23,7 @@ variable "thresholds" {
     availability_percent_min = number
     error_rate_percent_max   = number
     throttled_calls_max      = number
+    min_requests             = number
     latency_p95_ms_max       = number
   })
 }
@@ -54,7 +55,7 @@ locals {
       query       = <<-KQL
         AppRequests
         | summarize total = count(), ok = countif(toint(ResultCode) < 500)
-        | where total > 0
+        | where total >= ${var.thresholds.min_requests}
         | extend availability = 100.0 * ok / total
         | where availability < ${var.thresholds.availability_percent_min}
       KQL
@@ -65,7 +66,7 @@ locals {
       query       = <<-KQL
         AppRequests
         | summarize total = count(), errors = countif(toint(ResultCode) >= 500 or (toint(ResultCode) >= 400 and toint(ResultCode) !in (401, 403, 429)))
-        | where total > 0
+        | where total >= ${var.thresholds.min_requests}
         | extend error_rate = 100.0 * errors / total
         | where error_rate > ${var.thresholds.error_rate_percent_max}
       KQL
@@ -119,6 +120,9 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "gateway" {
   evaluation_frequency = "PT5M"
   window_duration      = "PT15M"
   tags                 = local.tags
+  # Alerte avec état : une notification au déclenchement, une à la résolution,
+  # au lieu d'une à chaque évaluation tant que la fenêtre contient l'anomalie.
+  auto_mitigation_enabled = true
 
   criteria {
     query                   = each.value.query
@@ -138,15 +142,16 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "gateway" {
 
 # OBS-06 : hausse anormale de l'ingestion de journaux (le plafond quotidien est posé sur l'espace).
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ingestion" {
-  name                 = "alrt-ingestion-${var.name_base}"
-  resource_group_name  = var.resource_group_name
-  location             = var.location
-  description          = "OBS-06 : volume ingéré sur 24 h au-dessus du seuil."
-  severity             = 2
-  scopes               = [var.workspace_id]
-  evaluation_frequency = "PT1H"
-  window_duration      = "P1D"
-  tags                 = local.tags
+  name                    = "alrt-ingestion-${var.name_base}"
+  resource_group_name     = var.resource_group_name
+  location                = var.location
+  description             = "OBS-06 : volume ingéré sur 24 h au-dessus du seuil."
+  severity                = 2
+  scopes                  = [var.workspace_id]
+  evaluation_frequency    = "PT1H"
+  window_duration         = "P1D"
+  tags                    = local.tags
+  auto_mitigation_enabled = true
 
   criteria {
     query                   = <<-KQL

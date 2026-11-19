@@ -33,6 +33,7 @@ def catalogue():
         "commun": commun,
         "envcat": envcat,
         "actifs": [m["alias"] for m in modeles if m["status"] == "active"],
+        "modeles": {m["alias"]: m for m in modeles if m["status"] == "active"},
         "app": next(a for a in envcat["applications"] if a["id"] == "opencode"),
     }
 

@@ -9,7 +9,10 @@ C'est un critère de sortie de la V1. La reconstruction prouve que rien n'existe
    - recrée les trois états depuis le code ;
    - lance les tests de la passerelle.
 3. Après la reconstruction, la clé d'abonnement d'OpenCode a changé : relancer `source scripts/opencode/aiplat-env.sh dev`.
+4. Chaque adresse du catalogue (`alerting.emails`) reçoit un courriel Azure Monitor « ajouté à un groupe d'actions » : le groupe d'actions est recréé. C'est attendu ; aucune action n'est nécessaire.
 
 Durée indicative : 20 à 30 minutes. Dev est indisponible pendant ce temps.
 
 Le groupe de ressources, les identités et les états sont portés par le bootstrap : ils ne sont pas supprimés. Le script refuse la suppression de la production.
+
+Le groupe d'actions « Application Insights Smart Detection » est créé automatiquement par Azure avec Application Insights ; il n'est pas dans le code. Il ne notifie que les rôles Monitoring Contributor et Monitoring Reader (aucun attribué en V1) et reste dans le groupe de ressources entre deux reconstructions.
