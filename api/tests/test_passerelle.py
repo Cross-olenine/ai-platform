@@ -137,13 +137,22 @@ def test_evenement_usage_enregistre(appel, catalogue):
 
 @pytest.mark.skipif(os.environ.get("RUN_RATE_LIMIT_TEST", "false").lower() != "true", reason="RUN_RATE_LIMIT_TEST")
 def test_limite_appels(appel, catalogue):
+    if not catalogue["actifs"]:
+        pytest.skip("aucun alias actif")
     limite = catalogue["app"]["limits"]["calls_per_minute"]
-    # Appels en parallèle : la limite (catalogue) doit être dépassée en bien moins d'une minute.
+    # Appels valides sur l'alias le moins cher : un appel refusé (400) fausserait l'alerte de taux d'erreur (OBS-07).
+    alias = min(catalogue["modeles"], key=lambda a: catalogue["modeles"][a]["pricing"]["input"])
+    # Vagues parallèles, arrêt au premier 429 : le nombre de 429 produits reste sous le seuil
+    # de l'alerte « limites-429 » du catalogue, le test ne déclenche donc pas de notification.
+    vague = max(1, min(32, catalogue["envcat"]["alerting"]["throttled_calls_max"] // 2))
     # En Consumption, le compteur est réparti entre nœuds et approximatif (environ +25 % mesuré, PO-11) :
-    # on envoie 2,5 fois la limite.
-    with ThreadPoolExecutor(max_workers=32) as pool:
-        codes = list(pool.map(lambda _: appel(corps("modele-inexistant")).status_code, range(int(limite * 2.5))))
-    assert 429 in codes, "aucune réponse 429 au-delà de la limite"
-    r = appel(corps("modele-inexistant"))
+    # jusqu'à 2,5 fois la limite.
+    codes = []
+    with ThreadPoolExecutor(max_workers=vague) as pool:
+        while 429 not in codes and len(codes) < limite * 2.5:
+            codes += list(pool.map(lambda _: appel(corps(alias)).status_code, range(vague)))
+    assert 429 in codes, f"aucune réponse 429 après {len(codes)} appels (limite {limite}/min)"
+    assert set(codes) <= {200, 429}, f"codes inattendus : {sorted(set(codes))}"
+    r = appel(corps(alias))
     if r.status_code == 429:
         assert code_erreur(r) == "rate_limited" and "Retry-After" in r.headers

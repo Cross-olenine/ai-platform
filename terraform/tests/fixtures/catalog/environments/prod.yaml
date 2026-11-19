@@ -25,6 +25,7 @@ alerting:
   availability_percent_min: 99
   error_rate_percent_max: 5
   throttled_calls_max: 100
+  min_requests: 50
   latency_p95_ms_max: 30000
 
 gateway:

@@ -25,6 +25,7 @@ alerting:                          # OBS-07
   availability_percent_min: 95
   error_rate_percent_max: 10
   throttled_calls_max: 50          # réponses 429 par fenêtre de 15 minutes
+  min_requests: 20                # volume minimal sur 15 min pour évaluer disponibilité et taux d'erreur
   latency_p95_ms_max: 30000
 
 gateway:
