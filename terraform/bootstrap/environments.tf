@@ -109,6 +109,12 @@ resource "azurerm_role_definition" "purge" {
       "Microsoft.ApiManagement/locations/deletedservices/delete",
       "Microsoft.KeyVault/locations/deletedVaults/read",
       "Microsoft.KeyVault/locations/deletedVaults/purge/action",
+      # Suivi des opérations de purge (asynchrones) : sans ces lectures, la purge est lancée
+      # mais Terraform échoue en 403 en attendant son résultat.
+      "Microsoft.CognitiveServices/locations/operationresults/read",
+      "Microsoft.ApiManagement/locations/operationResults/read",
+      "Microsoft.ApiManagement/locations/operationsStatuses/read",
+      "Microsoft.KeyVault/locations/operationResults/read",
     ]
   }
 
