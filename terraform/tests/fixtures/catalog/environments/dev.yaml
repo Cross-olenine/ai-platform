@@ -22,6 +22,7 @@ observability:
 
 alerting:                          # OBS-07
   emails: []                       # A_RENSEIGNER
+  notified_roles: []
   availability_percent_min: 95
   error_rate_percent_max: 10
   throttled_calls_max: 50          # réponses 429 par fenêtre de 15 minutes

@@ -10,7 +10,7 @@ Mode : **N** = natif Azure, **C** = configuration, **D** = développement spéci
 | OBS-04 | Les métriques restent à faible cardinalité. Le détail par utilisateur et par session vit dans les événements d'usage (table de journaux). | V1 | C | En cours |
 | OBS-05 | Le contenu des prompts et des réponses n'est pas journalisé par défaut. | V1 | C | En cours |
 | OBS-06 | Un plafond quotidien d'ingestion des journaux et une alerte sur hausse anormale sont en place. | V1 | N | En cours |
-| OBS-07 | Alertes de base : disponibilité, taux d'erreur, 429, latence. Alertes avec état (une notification au déclenchement, une à la résolution) ; disponibilité et taux d'erreur évalués au-delà d'un volume minimal (`alerting.min_requests`). | V1 | C | En cours |
+| OBS-07 | Alertes de base : disponibilité, taux d'erreur, 429, latence. Alertes avec état (une notification au déclenchement, une à la résolution) ; disponibilité et taux d'erreur évalués au-delà d'un volume minimal (`alerting.min_requests`). Notification par rôle Azure (`alerting.notified_roles`) : pas de code de validation à chaque recréation du groupe d'actions. | V1 | C | En cours |
 | OBS-08 | La journalisation du contenu est activable par offre, avec masquage et rétention courte (ADR-10). | V2 | C | À faire |
 | OBS-09 | Des tableaux de bord existent par offre, société et agent. | V2 | C | À faire |
 | OBS-10 | On navigue de la société à l'utilisateur, à la session, à la requête, à l'appel de modèle. | V2 | C | À faire |
