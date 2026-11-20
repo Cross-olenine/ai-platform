@@ -9,7 +9,7 @@ Les hypothèses sont dans `docs/suivi/hypotheses.md`, les points à vérifier da
 3. ~~Premier adaptateur (CHN-02)~~ : **réglé**. OpenCode est l'adaptateur de la V1. Le bloc agents managés est construit plus tard dans la V1, quand un cas C1 ou C2 arrive.
 4. ~~Deux alias de modèles~~ : **réglé le 18/11/2026**. `agent-general` = gpt-6-luna, `agent-fast` = gpt-5-nano depuis le 18/11/2026 (remplace gpt-4.1-nano ; test du changement de modèle derrière un alias). gpt-5-nano arrive en fin de support le 09/02/2027 : successeur à choisir avant.
 5. ~~Éléments RGPD du premier cas~~ : **abandonné** le 18/11/2026, la plateforme ne suit pas le RGPD (CMP-03).
-6. **Formulation d'IAM-01** : valider la reformulation imposée par ADR-18 (une clé d'abonnement identifie l'application mais n'authentifie pas).
+6. ~~Formulation d'IAM-01~~ : **validée le 19/11/2026**. Une clé d'abonnement identifie l'application mais n'authentifie pas ; le jeton Entra ID reste obligatoire (ADR-18).
 8. ~~Environnement d'apprentissage~~ : **réglé**, `rg-foundry-learning-dev` supprimé le 18/11/2026.
 7. ~~Dépôt GitHub~~ : **réglé**, dépôt public. Le second approbateur de la production (ADR-13) est reporté en V2, avec la mise en production.
 
