@@ -59,12 +59,12 @@ flowchart LR
 **Critères de sortie V1 :**
 
 - [ ] un cas d'usage est en pilote au niveau N2 (la production et le niveau N3 sont reportés en V2, décision du 18/11/2026) ;
-- [ ] aucun appel à un modèle ne contourne la passerelle (vérifié par test) ;
-- [ ] les limites d'appels par abonnement fonctionnent sur le niveau Consumption (PO-11) ;
-- [ ] Foundry refuse les appels hors passerelle, sans réseau privé (PO-13) ;
-- [ ] chaque appel produit un événement d'usage attribuable à un utilisateur et à une application, y compris en streaming (PO-12) ;
+- [x] aucun appel à un modèle ne contourne la passerelle (vérifié par test) (test `test_foundry_refuse_appel_direct`, 20/11/2026) ;
+- [x] les limites d'appels par abonnement fonctionnent sur le niveau Consumption (PO-11) (limite approximative, 20/11/2026) ;
+- [x] Foundry refuse les appels hors passerelle, sans réseau privé (PO-13) (20/11/2026) ;
+- [x] chaque appel produit un événement d'usage attribuable à un utilisateur et à une application, y compris en streaming (PO-12) (20/11/2026) ;
 - [ ] le coût estimé du mois est rapproché de la facture Azure, écart expliqué ;
-- [ ] un changement de modèle derrière un alias a été réalisé sans modifier le client ;
-- [ ] l'environnement de développement a été reconstruit entièrement depuis le code ;
+- [x] un changement de modèle derrière un alias a été réalisé sans modifier le client (gpt-4.1-nano vers gpt-5-nano, 19/11/2026) ;
+- [x] l'environnement de développement a été reconstruit entièrement depuis le code (workflow `reconstruire-dev`, 20/11/2026 : 63 ressources supprimées puis recréées, 12 tests sur 12) ;
 - [ ] ~~une personne extérieure à l'équipe a déployé un changement en suivant la documentation~~ : reporté en V2 (décision du 18/11/2026) ;
 - [ ] le coût fixe mensuel du socle est connu et suivi.
