@@ -102,23 +102,21 @@ resource "azurerm_role_definition" "purge" {
   description = "Purge des comptes Foundry, instances API Management et Key Vaults supprimés (reconstruction d'un environnement)."
 
   permissions {
+    # Liste complète, par service : tout ce qui concerne les ressources SUPPRIMÉES (lecture, suppression,
+    # purge) et le suivi des opérations asynchrones (lecture seule). Aucun droit sur les ressources actives.
     actions = [
-      "Microsoft.CognitiveServices/locations/resourceGroups/deletedAccounts/read",
-      "Microsoft.CognitiveServices/locations/resourceGroups/deletedAccounts/delete",
-      "Microsoft.ApiManagement/locations/deletedservices/read",
-      "Microsoft.ApiManagement/locations/deletedservices/delete",
-      "Microsoft.KeyVault/locations/deletedVaults/read",
-      "Microsoft.KeyVault/locations/deletedVaults/purge/action",
-      # Suivi des opérations de purge (asynchrones) : sans ces lectures, la purge est lancée
-      # mais Terraform échoue en 403 en attendant son résultat.
+      # Foundry (Cognitive Services)
+      "Microsoft.CognitiveServices/locations/resourceGroups/deletedAccounts/*",
       "Microsoft.CognitiveServices/locations/operationresults/read",
-      "Microsoft.ApiManagement/locations/operationResults/read",
-      "Microsoft.ApiManagement/locations/operationsStatuses/read",
-      "Microsoft.KeyVault/locations/operationResults/read",
-      # Certaines lectures de suivi ne sont pas listées par le fournisseur (ex. locations/deletedServices/operationResults) :
-      # jokers limités à la lecture des résultats d'opération.
       "Microsoft.CognitiveServices/locations/*/operationresults/read",
+      # API Management
+      "Microsoft.ApiManagement/locations/deletedservices/*",
+      "Microsoft.ApiManagement/locations/operationResults/read",
       "Microsoft.ApiManagement/locations/*/operationResults/read",
+      "Microsoft.ApiManagement/locations/operationsStatuses/read",
+      # Key Vault
+      "Microsoft.KeyVault/locations/deletedVaults/*",
+      "Microsoft.KeyVault/locations/operationResults/read",
       "Microsoft.KeyVault/locations/*/operationResults/read",
     ]
   }
