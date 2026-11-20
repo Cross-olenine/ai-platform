@@ -21,7 +21,8 @@ observability:
   ingestion_alert_gb: 0.5          # OBS-06 : alerte sur hausse anormale
 
 alerting:                          # OBS-07
-  emails: [christophe.etienne@outlook.be]
+  emails: []                       # une adresse exige un code de validation à chaque recréation du groupe d'actions
+  notified_roles: [Owner]          # destinataires par rôle Azure : pas de validation par code
   availability_percent_min: 95
   error_rate_percent_max: 10
   throttled_calls_max: 50          # réponses 429 par fenêtre de 15 minutes

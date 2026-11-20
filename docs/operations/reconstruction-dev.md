@@ -9,7 +9,7 @@ C'est un critère de sortie de la V1. La reconstruction prouve que rien n'existe
    - recrée les trois états depuis le code ;
    - lance les tests de la passerelle.
 3. Après la reconstruction, la clé d'abonnement d'OpenCode a changé : relancer `source scripts/opencode/aiplat-env.sh dev`.
-4. Chaque adresse du catalogue (`alerting.emails`) reçoit un courriel Azure Monitor « ajouté à un groupe d'actions » : le groupe d'actions est recréé. C'est attendu ; aucune action n'est nécessaire.
+4. Les alertes notifient les propriétaires de l'abonnement par **rôle Azure** (`alerting.notified_roles`), pas par adresse courriel : une adresse d'un groupe d'actions exige un code de validation à usage unique (30 minutes) à chaque création du groupe, donc à chaque reconstruction. Un rôle n'en demande pas.
 
 Durée indicative : 20 à 30 minutes. Dev est indisponible pendant ce temps.
 

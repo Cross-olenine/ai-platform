@@ -20,6 +20,7 @@ variable "thresholds" {
   description = "Bloc « alerting » du catalogue d'environnement."
   type = object({
     emails                   = list(string)
+    notified_roles           = list(string)
     availability_percent_min = number
     error_rate_percent_max   = number
     throttled_calls_max      = number
@@ -42,6 +43,16 @@ variable "quota_alert_percent" {
   description = "RES-03 : seuil d'alerte de consommation du quota d'un déploiement."
   type        = number
   default     = 80
+}
+
+# Destinataires par rôle Azure (ex. Owner) : contrairement à une adresse courriel, un rôle n'exige pas
+# de validation par code à usage unique à chaque (re)création du groupe d'actions.
+data "azurerm_subscription" "current" {}
+
+data "azurerm_role_definition" "notified" {
+  for_each = toset(var.thresholds.notified_roles)
+  name     = each.value
+  scope    = data.azurerm_subscription.current.id
 }
 
 locals {
@@ -104,6 +115,15 @@ resource "azurerm_monitor_action_group" "this" {
     content {
       name                    = "email-${email_receiver.key}"
       email_address           = email_receiver.value
+      use_common_alert_schema = true
+    }
+  }
+
+  dynamic "arm_role_receiver" {
+    for_each = data.azurerm_role_definition.notified
+    content {
+      name                    = "role-${arm_role_receiver.key}"
+      role_id                 = arm_role_receiver.value.role_definition_id
       use_common_alert_schema = true
     }
   }

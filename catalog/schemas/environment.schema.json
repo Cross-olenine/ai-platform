@@ -40,9 +40,10 @@
     },
     "alerting": {
       "type": "object", "additionalProperties": false,
-      "required": ["emails", "availability_percent_min", "error_rate_percent_max", "throttled_calls_max", "min_requests", "latency_p95_ms_max"],
+      "required": ["emails", "notified_roles", "availability_percent_min", "error_rate_percent_max", "throttled_calls_max", "min_requests", "latency_p95_ms_max"],
       "properties": {
         "emails": {"type": "array", "items": {"type": "string", "format": "email"}},
+        "notified_roles": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
         "availability_percent_min": {"type": "number", "minimum": 0, "maximum": 100},
         "error_rate_percent_max": {"type": "number", "minimum": 0, "maximum": 100},
         "throttled_calls_max": {"type": "integer", "minimum": 1},

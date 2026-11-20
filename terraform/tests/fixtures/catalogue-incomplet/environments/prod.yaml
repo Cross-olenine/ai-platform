@@ -21,7 +21,8 @@ observability:
   ingestion_alert_gb: 2
 
 alerting:
-  emails: []
+  emails: []                       # une adresse exige un code de validation à chaque recréation du groupe d'actions
+  notified_roles: [Owner]          # destinataires par rôle Azure : pas de validation par code
   availability_percent_min: 99
   error_rate_percent_max: 5
   throttled_calls_max: 100
