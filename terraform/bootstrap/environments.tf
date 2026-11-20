@@ -115,6 +115,11 @@ resource "azurerm_role_definition" "purge" {
       "Microsoft.ApiManagement/locations/operationResults/read",
       "Microsoft.ApiManagement/locations/operationsStatuses/read",
       "Microsoft.KeyVault/locations/operationResults/read",
+      # Certaines lectures de suivi ne sont pas listées par le fournisseur (ex. locations/deletedServices/operationResults) :
+      # jokers limités à la lecture des résultats d'opération.
+      "Microsoft.CognitiveServices/locations/*/operationresults/read",
+      "Microsoft.ApiManagement/locations/*/operationResults/read",
+      "Microsoft.KeyVault/locations/*/operationResults/read",
     ]
   }
 
