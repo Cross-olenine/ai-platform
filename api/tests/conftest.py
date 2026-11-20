@@ -6,6 +6,7 @@ Variables : AIPLAT_ENV (dev|prod), GATEWAY_API_CLIENT_ID (sinon recherche par no
 import json
 import os
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -73,3 +74,23 @@ def appel(url, jeton, cle):
         h.update(entetes or {})
         return requests.post(url, data=json.dumps(corps), headers=h, timeout=120, **kw)
     return _appel
+
+
+@pytest.fixture(scope="session", autouse=True)
+def passerelle_prete(url, jeton, cle, catalogue):
+    """Après la création de l'environnement, le droit d'accès de la passerelle à Foundry met plusieurs minutes
+    à se propager (500 entre-temps). On attend un premier appel valide avant les tests, 10 minutes au plus."""
+    if not catalogue["actifs"]:
+        return
+    entetes = {"Content-Type": "application/json", "Authorization": f"Bearer {jeton}", "Ocp-Apim-Subscription-Key": cle}
+    corps = {"model": catalogue["actifs"][0], "input": "ok", "max_output_tokens": 16}
+    fin = time.monotonic() + 600
+    while True:
+        try:
+            if requests.post(url, data=json.dumps(corps), headers=entetes, timeout=60).status_code == 200:
+                return
+        except requests.RequestException:
+            pass
+        if time.monotonic() > fin:
+            return  # les tests signaleront l'échec avec leur propre message
+        time.sleep(20)

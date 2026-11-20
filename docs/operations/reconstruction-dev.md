@@ -8,6 +8,8 @@ C'est un critère de sortie de la V1. La reconstruction prouve que rien n'existe
    - purge Foundry, API Management et le Key Vault supprimés de façon réversible. Il utilise pour cela un rôle limité à ces purges, accordé par le bootstrap aux seuls environnements sans protection contre la purge (`key_vault.purge_protection: false`) ;
    - recrée les trois états depuis le code ;
    - lance les tests de la passerelle.
+
+Azure met parfois plusieurs minutes à propager une ressource recréée (espace de logs, droit d'accès de la passerelle à Foundry). Le script rejoue l'application jusqu'à 3 fois, 3 minutes d'écart (`ATTENTE_PROPAGATION`), et les tests attendent jusqu'à 10 minutes un premier appel valide avant de commencer.
 3. Après la reconstruction, la clé d'abonnement d'OpenCode a changé : relancer `source scripts/opencode/aiplat-env.sh dev`.
 4. Les alertes notifient les propriétaires de l'abonnement par **rôle Azure** (`alerting.notified_roles`), pas par adresse courriel : une adresse d'un groupe d'actions exige un code de validation à usage unique (30 minutes) à chaque création du groupe, donc à chaque reconstruction. Un rôle n'en demande pas.
 
