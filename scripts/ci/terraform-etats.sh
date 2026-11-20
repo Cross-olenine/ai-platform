@@ -48,7 +48,15 @@ for etat in socle observabilite passerelle-modeles; do
   if [ "$code" -eq 2 ]; then drift=1; [ "$mode" != "apply" ] && pending=1; fi
   terraform -chdir="$dir" show -no-color tfplan > "$dir/tfplan.txt"
   if [ "$mode" = "apply" ] && [ "$code" -eq 2 ]; then
-    terraform -chdir="$dir" apply -input=false tfplan
+    # Une ressource recréée (espace de logs, identité) peut n'être visible des ressources suivantes
+    # qu'après quelques minutes : en cas d'échec, on attend puis on rejoue plan et application (3 essais).
+    for essai in 1 2 3; do
+      if terraform -chdir="$dir" apply -input=false tfplan; then break; fi
+      if [ "$essai" -eq 3 ]; then echo "::error::application en échec après 3 essais ($env/$etat)"; exit 1; fi
+      echo "::warning::application en échec ($env/$etat), nouvel essai dans ${ATTENTE_PROPAGATION:-180} s (propagation Azure)"
+      sleep "${ATTENTE_PROPAGATION:-180}"
+      terraform -chdir="$dir" plan -input=false -out=tfplan
+    done
   fi
   echo "::endgroup::"
 done
