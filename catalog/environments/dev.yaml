@@ -43,7 +43,7 @@ applications:                      # MGW-03 : une application = un abonnement AP
     display_name: OpenCode (Software Factory)
     channel: opencode
     owner: ai-platform-team
-    allowed_models: [agent-general, agent-fast]
+    allowed_models: [agent-general, agent-fast, embedding-default]
     limits:                        # pilote N2 : environ 50 développeurs (docs/cas-usage/opencode.md)
       calls_per_minute: 150        # environ 15 développeurs actifs simultanément, 10 appels/min chacun
       calls_per_period: 50000

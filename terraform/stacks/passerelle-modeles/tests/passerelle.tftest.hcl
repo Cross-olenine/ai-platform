@@ -88,7 +88,7 @@ run "rendu_depuis_catalogue" {
   }
 
   assert {
-    condition     = module.model_gateway.model_routes == "agent-fast|agent-fast-v1|4096|512|2026-01-01;agent-general|agent-general-v1|16384|512|2026-01-01"
+    condition     = module.model_gateway.model_routes == "agent-fast|agent-fast-v1|4096|512|2026-01-01|chat;agent-general|agent-general-v1|16384|512|2026-01-01|chat;embedding-default|embedding-default-v1|0|512|2026-01-01|embedding"
     error_message = "La table de routage alias -> déploiement doit venir du catalogue (MGW-01)."
   }
 

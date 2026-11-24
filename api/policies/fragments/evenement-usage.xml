@@ -1,5 +1,6 @@
 <!-- FIN-01, OBS-02, OBS-05 : un événement d'usage par requête (docs/reference/evenement-usage.md), sans contenu.
      policy trace -> Application Insights (AppTraces), ADR-18. Tokens à -1 si inconnus (streaming : voir TokenUsage, PO-12).
+     ADR-19 : une réponse d'embedding porte usage.prompt_tokens (entrée) et aucun token de sortie (0).
      Le coût estimé est calculé à la lecture à partir des tarifs du catalogue (FIN-02, fonction UsageCost). -->
 <fragment>
 	<set-header name="x-trace-id" exists-action="override">
@@ -14,9 +15,9 @@
 			var b = v.GetValueOrDefault&lt;JObject>("response-body", null);
 			if (!st &amp;&amp; hs &lt; 400 &amp;&amp; b != null) {
 				var u = b["usage"];
-				i = u?["input_tokens"]?.Value&lt;long>() ?? -1;
+				i = u?["input_tokens"]?.Value&lt;long>() ?? u?["prompt_tokens"]?.Value&lt;long>() ?? -1;
 				c = u?["input_tokens_details"]?["cached_tokens"]?.Value&lt;long>() ?? 0;
-				o = u?["output_tokens"]?.Value&lt;long>() ?? -1;
+				o = u?["output_tokens"]?.Value&lt;long>() ?? (u?["prompt_tokens"] != null ? 0 : -1);
 				r = u?["output_tokens_details"]?["reasoning_tokens"]?.Value&lt;long>() ?? 0;
 				t = 0;
 				foreach (var x in (b["output"] as JArray) ?? new JArray()) { if (x["type"]?.ToString() == "function_call") { t++; } }

@@ -74,9 +74,9 @@ locals {
   #   Conséquence : pas de commentaire « // » dans les expressions C# des fragments.
   minify = { for k, f in local.fragments : k => trimspace(replace(replace(file("${var.policies_path}/fragments/${f}"), "/<!--[\\s\\S]*?-->/", ""), "/\\s*\\n\\s*/", " ")) }
 
-  # alias|déploiement|max_output_tokens|max_request_kb|version (fragment liste-blanche-routage).
+  # alias|déploiement|max_output_tokens|max_request_kb|version|kind (fragment liste-blanche-routage ; kind : chat ou embedding, ADR-19).
   model_routes = length(var.models) == 0 ? "none" : join(";", [
-    for alias, m in var.models : join("|", [alias, m.deployment_name, tostring(m.max_output_tokens), tostring(m.max_request_kb), m.model_version])
+    for alias, m in var.models : join("|", [alias, m.deployment_name, tostring(try(m.max_output_tokens, 0)), tostring(m.max_request_kb), m.model_version, try(m.kind, "chat")])
   ])
 
   applications = { for a in var.applications : a.id => a }

@@ -3,7 +3,7 @@
 | Bloc | V1 | V2 | V3 | V4 |
 |---|---|---|---|---|
 | Identité | Entra, 1 tenant, identité managée | Multi-tenant, contexte société, révocation | Au nom de l'utilisateur, identité d'agent | Accès conditionnel, revue des droits |
-| Model Gateway | 2 alias, limites, streaming | Repli, lots, quotas par société | Embeddings | Capacité réservée, cache, routage, modèles tiers |
+| Model Gateway | 2 alias de chat + 1 alias d'embeddings (ADR-19), limites, streaming | Repli, lots, quotas par société | RAG sur les embeddings | Capacité réservée, cache, routage, modèles tiers |
 | Agent Runtime | Agents managés, sessions | Agents code, cycle de vie 5 états | Outils, sources, mémoire, asynchrone | Multi-agents, 8 états |
 | Passerelle | 8 fragments de base | Fragments complets, révisions | Exposition MCP | Multi-région |
 | Sociétés | Dimension présente dans les données | Référentiel, isolation mutualisée | Index et mémoire isolés | Isolation dédiée |

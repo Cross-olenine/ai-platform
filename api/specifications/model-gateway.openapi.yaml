@@ -3,7 +3,7 @@ info:
   title: Model Gateway
   version: "1.0"
   description: |
-    Accès gouverné aux modèles de la plateforme IA (ADR-06 : API Responses).
+    Accès gouverné aux modèles de la plateforme IA (ADR-06 : API Responses ; ADR-19 : API Embeddings).
     Authentification : jeton Entra ID (en-tête Authorization) et clé d'abonnement de l'application
     (en-tête Ocp-Apim-Subscription-Key, ADR-18). Le champ « model » contient un alias du catalogue (MGW-01).
 servers:
@@ -54,6 +54,72 @@ paths:
                 type: string
         "400":
           description: "Requête refusée : model_not_allowed, parameter_not_allowed, tool_not_allowed, content_filter…"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Jeton absent, invalide ou sans rôle applicatif.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "413":
+          description: Requête trop volumineuse pour l'alias.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "429":
+          description: Limite d'appels de l'application atteinte (en-tête Retry-After).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /embeddings:
+    post:
+      operationId: createEmbedding
+      summary: Créer des embeddings (ADR-19)
+      description: Le champ « model » doit être un alias d'embedding du catalogue (par exemple embedding-default).
+      parameters:
+        - name: traceparent
+          in: header
+          required: false
+          description: Contexte de trace W3C (OBS-01). Créé par la passerelle s'il est absent.
+          schema:
+            type: string
+        - name: x-session-id
+          in: header
+          required: false
+          description: Identifiant de session côté client, repris dans l'événement d'usage.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model, input]
+              properties:
+                model:
+                  type: string
+                  description: Alias d'embedding du catalogue (MGW-15).
+                input:
+                  description: Texte ou liste de textes à vectoriser.
+                dimensions:
+                  type: integer
+                  description: Nombre de dimensions du vecteur retourné (optionnel).
+              additionalProperties: true
+      responses:
+        "200":
+          description: Vecteurs d'embedding et nombre de tokens d'entrée (usage.prompt_tokens).
+          headers:
+            x-trace-id:
+              schema:
+                type: string
+        "400":
+          description: "Requête refusée : model_not_allowed (y compris alias de chat sur cette route), parameter_not_allowed…"
           content:
             application/json:
               schema:

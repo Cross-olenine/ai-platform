@@ -33,8 +33,10 @@ def catalogue():
         "base": base,
         "commun": commun,
         "envcat": envcat,
-        "actifs": [m["alias"] for m in modeles if m["status"] == "active"],
-        "modeles": {m["alias"]: m for m in modeles if m["status"] == "active"},
+        # ADR-19 : « actifs » et « modeles » ne contiennent que les modèles de chat (route /responses).
+        "actifs": [m["alias"] for m in modeles if m["status"] == "active" and m.get("kind", "chat") == "chat"],
+        "modeles": {m["alias"]: m for m in modeles if m["status"] == "active" and m.get("kind", "chat") == "chat"},
+        "embeddings": [m["alias"] for m in modeles if m["status"] == "active" and m.get("kind", "chat") == "embedding"],
         "app": next(a for a in envcat["applications"] if a["id"] == "opencode"),
     }
 
@@ -42,6 +44,11 @@ def catalogue():
 @pytest.fixture(scope="session")
 def url(catalogue):
     return f'https://apim-{catalogue["base"]}.azure-api.net/model-gateway/v1/responses'
+
+
+@pytest.fixture(scope="session")
+def url_embeddings(url):
+    return url.removesuffix("/responses") + "/embeddings"
 
 
 @pytest.fixture(scope="session")
@@ -65,14 +72,14 @@ def cle(catalogue):
 
 @pytest.fixture
 def appel(url, jeton, cle):
-    def _appel(corps, entetes=None, jeton_=None, cle_=None, **kw):
+    def _appel(corps, entetes=None, jeton_=None, cle_=None, url_=None, **kw):
         h = {"Content-Type": "application/json"}
         if (jeton_ if jeton_ is not None else jeton):
             h["Authorization"] = f"Bearer {jeton_ if jeton_ is not None else jeton}"
         if (cle_ if cle_ is not None else cle):
             h["Ocp-Apim-Subscription-Key"] = cle_ if cle_ is not None else cle
         h.update(entetes or {})
-        return requests.post(url, data=json.dumps(corps), headers=h, timeout=120, **kw)
+        return requests.post(url_ or url, data=json.dumps(corps), headers=h, timeout=120, **kw)
     return _appel
 
 

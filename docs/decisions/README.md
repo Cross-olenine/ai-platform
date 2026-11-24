@@ -3,7 +3,7 @@
 Une décision **ouverte** n'est jamais tranchée par un agent de code : il expose les options et demande.
 Statuts : `Ouverte`, `Acceptée`, `Remplacée`.
 
-Les ADR de V2 à V4 sont dans `plus-tard/` (ADR-04, 09, 10, 11, 14, 15, 17). Prochain numéro libre : ADR-19.
+Les ADR de V2 à V4 sont dans `plus-tard/` (ADR-04, 09, 10, 11, 14, 15, 17). Prochain numéro libre : ADR-20.
 
 | ADR | Décision | Échéance | Statut | Fichier |
 |---|---|---|---|---|
@@ -18,3 +18,4 @@ Les ADR de V2 à V4 sont dans `plus-tard/` (ADR-04, 09, 10, 11, 14, 15, 17). Pro
 | ADR-13 | Outillage Git et pipelines | V1 | Acceptée | `docs/decisions/ADR-13-outillage-git-pipelines.md` |
 | ADR-16 | Frontière avec les produits sur étagère | V1 | Acceptée | `docs/decisions/ADR-16-frontiere-produits-etagere.md` |
 | ADR-18 | Niveau d'API Management en V1 : Consumption | V1 | Acceptée | `docs/decisions/ADR-18-niveau-api-management-v1.md` |
+| ADR-19 | Embeddings exposés par le Model Gateway | V1 | Acceptée | `docs/decisions/ADR-19-api-embeddings-model-gateway.md` |

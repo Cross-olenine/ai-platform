@@ -1,34 +1,41 @@
 # Exemples d'entrées de catalogue
 
-Exemples illustratifs. Le schéma exact est à fixer en V1.
+Exemples illustratifs : la source de vérité est `catalog/schemas/`.
 
-**Modèle :**
+**Modèle de chat** (schéma exact : `catalog/schemas/model.schema.json`, exemple réel : `catalog/models/agent-fast.yaml`) :
 
 ```yaml
 alias: agent-general
+kind: chat                 # chat (défaut) ou embedding (ADR-19)
 owner: ai-platform-team
 status: active
 provider: azure
 model: <nom-du-modele>
 model_version: "<version>"
+model_format: OpenAI
 deployment_name: <nom-du-deploiement>
 deployment_type: DataZoneStandard
-region: swedencentral
-protocol: responses
+region: francecentral
+protocol: responses        # ADR-06
 context_window: 0          # à renseigner
 max_output_tokens: 4096
+max_request_kb: 1024
 capabilities: [streaming, tools]
-pricing:                   # par million de tokens, à renseigner
+pricing:                   # EUR par million de tokens, à renseigner
   input: 0.0
   cached_input: 0.0
   output: 0.0
 limits:
-  tokens_per_minute: 0     # à renseigner
+  capacity_thousand_tpm:   # milliers de tokens par minute et par environnement
+    dev: 10
+    prod: 10
 fallback_alias: agent-fast # V2
-offers: [agent-platform]
+offers: [model-gateway]
 end_of_support: "<date>"
 review_date: "<date>"
 ```
+
+**Modèle d'embedding** (ADR-19, exemple réel : `catalog/models/embedding-default.yaml`) : mêmes champs, avec `kind: embedding`, `protocol: embeddings`, sans `max_output_tokens`, `cached_input` ni tarif de sortie (`output: 0`).
 
 **Agent :**
 

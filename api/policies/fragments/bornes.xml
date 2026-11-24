@@ -26,13 +26,14 @@
 		<when condition='@(((string)context.Variables["rejection"]) == "")'>
 			<set-variable name="streaming" value='@{
 				var s = ((JObject)context.Variables["request-body"])["stream"];
-				return s != null &amp;&amp; s.Type == JTokenType.Boolean &amp;&amp; (bool)s;
+				return s != null &amp;&amp; s.Type == JTokenType.Boolean &amp;&amp; (bool)s &amp;&amp; ((string)context.Variables["route"]).Split(&apos;|&apos;)[5] == "chat";
 			}' />
 			<set-body>@{
 				var body = (JObject)context.Variables["request-body"];
 				var route = ((string)context.Variables["route"]).Split('|');
 				var cap = int.Parse(route[2]);
 				body["model"] = route[1];
+				if (route[5] == "embedding") { return body.ToString(Newtonsoft.Json.Formatting.None); }
 				var requested = body["max_output_tokens"];
 				if (requested == null || requested.Type != JTokenType.Integer || (int)requested > cap) { body["max_output_tokens"] = cap; }
 				return body.ToString(Newtonsoft.Json.Formatting.None);
