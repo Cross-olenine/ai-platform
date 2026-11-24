@@ -43,7 +43,7 @@ applications:                      # MGW-03 : une application = un abonnement AP
     display_name: OpenCode (Software Factory)
     channel: opencode
     owner: ai-platform-team
-    allowed_models: [agent-general, agent-fast]
+    allowed_models: [agent-general, agent-fast, embedding-default]
     limits:
       calls_per_minute: 30
       calls_per_period: 5000

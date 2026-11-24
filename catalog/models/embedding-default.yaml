@@ -1,0 +1,29 @@
+# Alias d'embeddings (MGW-15, ADR-19). text-embedding-3-small : meilleur rapport qualité/prix des embeddings Azure OpenAI.
+# À CONFIRMER dans Foundry avant le premier déploiement (PO-20) : disponibilité en Data Zone Standard depuis
+# France Central, quota, version exacte, fin de support et tarif en EUR. Aucun de ces points n'a pu être vérifié
+# depuis l'environnement de développement (réseau restreint).
+alias: embedding-default
+kind: embedding
+owner: ai-platform-team
+status: active
+provider: azure
+model: text-embedding-3-small
+model_version: "1"                # à confirmer (PO-20)
+model_format: OpenAI
+deployment_name: embedding-default-text-embedding-3-small
+deployment_type: DataZoneStandard
+region: francecentral
+protocol: embeddings              # ADR-19
+context_window: 8191              # tokens d'entrée maximum par texte (publié pour text-embedding-3-small) ; à confirmer (PO-20)
+max_request_kb: 1024
+capabilities: [embeddings]
+pricing:                          # EUR par million de tokens d'entrée ; pas de tokens de sortie. Valeur à confirmer (PO-20).
+  input: 0.0185                   # environ 0,02 USD : à remplacer par le prix public Data Zone en EUR
+  output: 0
+limits:
+  capacity_thousand_tpm:          # quota Data Zone France Central de l'abonnement : à confirmer (PO-20)
+    dev: 100
+    prod: 50
+offers: [model-gateway]
+end_of_support: "2027-04-14"      # à confirmer (PO-20) : consulter le calendrier de retrait Microsoft
+review_date: "2027-01-15"

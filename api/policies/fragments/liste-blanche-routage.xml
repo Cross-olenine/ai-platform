@@ -1,5 +1,6 @@
 <!-- MGW-01, MGW-02, MGW-07 : l'alias demandé doit être actif au catalogue et autorisé pour l'application.
-     model-routes (named value générée depuis catalog/models) : alias|déploiement|max_output_tokens|max_request_kb|version;...
+     model-routes (named value générée depuis catalog/models) : alias|déploiement|max_output_tokens|max_request_kb|version|kind;...
+     ADR-19 : la nature du modèle (chat ou embedding) doit correspondre à l'opération appelée (/responses ou /embeddings).
      En cas de refus, pose la variable « rejection » (statut|code) ; la policy de l'API renvoie l'erreur. -->
 <fragment>
 	<set-variable name="request-body" value="@(context.Request.Body?.As&lt;JObject>(preserveContent: true))" />
@@ -11,9 +12,10 @@
 		var alias = (string)context.Variables["model-alias"];
 		var allowed = context.Variables.GetValueOrDefault&lt;string>("allowed-models", "").Split(&apos;,&apos;);
 		if (alias == "" || !allowed.Contains(alias)) { return ""; }
+		var expected = context.Operation.Id == "createEmbedding" ? "embedding" : "chat";
 		foreach (var r in "{{model-routes}}".Split(&apos;;&apos;)) {
 			var p = r.Split(&apos;|&apos;);
-			if (p.Length == 5 &amp;&amp; p[0] == alias) { return r; }
+			if (p.Length == 6 &amp;&amp; p[0] == alias &amp;&amp; p[5] == expected) { return r; }
 		}
 		return "";
 	}' />

@@ -9,7 +9,7 @@ flowchart LR
   U["Utilisateur"] --> C["Un adaptateur de canal"]
   C -->|"Jeton Entra ID"| G["API Management : fragments V1"]
   G --> A["Agent managé (Foundry Agent Service)"]
-  G --> M["Modèles Foundry : 2 alias"]
+  G --> M["Modèles Foundry : 3 alias"]
   A -->|"via la passerelle"| M
   G -.-> O["Log Analytics : métriques et événements d'usage"]
   G -.-> K["Key Vault"]
@@ -24,7 +24,7 @@ flowchart LR
 | Environnements | Développement et production. Une région de l'UE : France Central. |
 | Identité | Jeton Entra ID obligatoire, un seul tenant. Identité managée entre la passerelle et Foundry. Authentification par clé désactivée sur Foundry. |
 | Passerelle | Une instance API Management par environnement. Niveau Consumption (ADR-18). Fragments : authentification, contexte, corrélation, liste blanche, limite d'appels par abonnement, erreurs normalisées, routage par alias. |
-| Modèles | 2 alias (un généraliste, un rapide et économique). Déploiements en zone de données UE. |
+| Modèles | 3 alias : un généraliste, un rapide et économique, et un modèle d'embeddings (`embedding-default`, avancé de V3 par ADR-19). Déploiements en zone de données UE. |
 | Agents | Agents managés définis par configuration. Sessions gérées par le runtime. |
 | Canal | Un seul adaptateur, choisi selon le premier cas d'usage. |
 | Assistant de développement (C6) | OpenCode branché sur la passerelle. Configuration centrale d'OpenCode (CHN-07). Quotas par application (MGW-03). |

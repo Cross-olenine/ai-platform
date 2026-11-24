@@ -1,0 +1,26 @@
+# Embedding fictif (ADR-19) : vérifie le routage /embeddings et les préconditions CAT-04 sans tokens de sortie.
+alias: embedding-default
+kind: embedding
+owner: ai-platform-team
+status: active
+provider: azure
+model: modele-embedding-test
+model_version: "2026-01-01"
+model_format: OpenAI
+deployment_name: embedding-default-v1
+deployment_type: DataZoneStandard
+region: francecentral
+protocol: embeddings
+context_window: 8191
+max_request_kb: 512
+capabilities: [embeddings]
+pricing:
+  input: 0.02
+  output: 0
+limits:
+  capacity_thousand_tpm:
+    dev: 10
+    prod: 10
+offers: [model-gateway]
+end_of_support: "2099-12-31"
+review_date: "2027-05-17"

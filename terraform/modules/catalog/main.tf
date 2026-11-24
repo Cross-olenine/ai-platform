@@ -27,8 +27,12 @@ locals {
   # Seuls les modèles actifs sont déployés et routés (MGW-02 : liste blanche).
   # La capacité est résolue pour l'environnement demandé (quota partagé entre environnements).
   active_models = {
+    # Valeurs par défaut : kind = chat (ADR-19) ; tokens de sortie et tarifs absents d'un embedding = 0.
     for k, m in local.all_models : m.alias => merge(m, {
-      limits = merge(m.limits, { capacity_thousand_tpm = try(m.limits.capacity_thousand_tpm[var.environment], 0) })
+      kind              = try(m.kind, "chat")
+      max_output_tokens = try(m.max_output_tokens, 0)
+      pricing           = merge({ cached_input = 0, output = 0 }, m.pricing)
+      limits            = merge(m.limits, { capacity_thousand_tpm = try(m.limits.capacity_thousand_tpm[var.environment], 0) })
     }) if m.status == "active"
   }
 
@@ -67,9 +71,16 @@ resource "terraform_data" "checks" {
     }
     precondition {
       condition = alltrue([
-        for m in local.active_models : m.model != "A_CHOISIR" && m.owner != "" && m.pricing.input > 0 && m.pricing.output > 0 && m.limits.capacity_thousand_tpm > 0
+        # Un embedding (ADR-19) n'a pas de tokens de sortie : seul le tarif d'entrée est exigé.
+        for m in local.active_models : m.model != "A_CHOISIR" && m.owner != "" && m.pricing.input > 0 && (m.kind == "embedding" || m.pricing.output > 0) && m.limits.capacity_thousand_tpm > 0
       ])
       error_message = "CAT-04 : un modèle actif doit avoir un modèle choisi, un propriétaire, un tarif et une limite."
+    }
+    precondition {
+      condition = alltrue([
+        for m in local.active_models : m.kind == "embedding" ? m.protocol == "embeddings" : (m.protocol == "responses" && try(m.max_output_tokens, 0) > 0)
+      ])
+      error_message = "ADR-06, ADR-19 : un chat utilise le protocole responses avec un plafond de sortie, un embedding le protocole embeddings."
     }
     precondition {
       condition     = alltrue([for m in local.active_models : contains(local.commun.governance.allowed_model_deployment_types, m.deployment_type)])

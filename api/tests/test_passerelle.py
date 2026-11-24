@@ -89,6 +89,38 @@ def test_appel_nominal(appel, catalogue):
         assert entete not in r.headers
 
 
+# --- Embeddings (MGW-15, ADR-19)
+
+def test_embedding_nominal(appel, catalogue, url_embeddings):
+    if not catalogue["embeddings"]:
+        pytest.skip("aucun alias d'embedding actif")
+    alias = catalogue["embeddings"][0]
+    r = appel({"model": alias, "input": "bonjour"}, url_=url_embeddings)
+    assert r.status_code == 200, r.text
+    corps_reponse = r.json()
+    assert corps_reponse["model"] == alias
+    assert len(corps_reponse["data"][0]["embedding"]) > 0
+    assert corps_reponse["usage"]["prompt_tokens"] > 0
+    for entete in ("x-ms-region", "x-ms-deployment-name"):
+        assert entete not in r.headers
+
+
+def test_alias_chat_refuse_sur_embeddings(appel, catalogue, url_embeddings):
+    if not catalogue["actifs"]:
+        pytest.skip("aucun alias de chat actif")
+    r = appel({"model": catalogue["actifs"][0], "input": "x"}, url_=url_embeddings)
+    assert r.status_code == 400
+    assert code_erreur(r) == "model_not_allowed"
+
+
+def test_alias_embedding_refuse_sur_responses(appel, catalogue):
+    if not catalogue["embeddings"]:
+        pytest.skip("aucun alias d'embedding actif")
+    r = appel(corps(catalogue["embeddings"][0]))
+    assert r.status_code == 400
+    assert code_erreur(r) == "model_not_allowed"
+
+
 # --- PO-12 : streaming sans mise en tampon (MGW-06)
 
 def test_streaming_sans_tampon(appel, catalogue):

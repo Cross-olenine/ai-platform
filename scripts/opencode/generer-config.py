@@ -35,7 +35,8 @@ def main() -> None:
         if app is None:
             continue
         base = f'{plateforme["prefix"]}-{env["name"]}-{plateforme["location_short"]}-{env["name_suffix"]}'
-        alias = [a for a in app["allowed_models"] if a in modeles]
+        # ADR-19 : OpenCode ne déclare que les modèles de chat ; un embedding n'est jamais le modèle par défaut.
+        alias = [a for a in app["allowed_models"] if a in modeles and modeles[a].get("kind", "chat") == "chat"]
 
         config = {
             "$schema": "https://opencode.ai/config.json",
